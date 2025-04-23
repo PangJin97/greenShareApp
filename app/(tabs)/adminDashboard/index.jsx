@@ -1,14 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const SearchDetailScreen = () => {
+const ProfileHomeScreen = () => {
   return (
     <View>
-      <Text>SearchDetailScreen</Text>
+      <Text>대시보드와 작물리스트</Text>
     </View>
   )
 }
 
-export default SearchDetailScreen
+export default ProfileHomeScreen
 
 const styles = StyleSheet.create({})

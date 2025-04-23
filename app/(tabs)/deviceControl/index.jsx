@@ -1,14 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const DetailScreen = () => {
+const ProfileHomeScreen = () => {
   return (
     <View>
-      <Text>DetailScreen</Text>
+      <Text>관리자 기기제어</Text>
     </View>
   )
 }
 
-export default DetailScreen
+export default ProfileHomeScreen
 
 const styles = StyleSheet.create({})

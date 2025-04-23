@@ -11,17 +11,28 @@ const TabLayout = () => {
         <Tabs screenOptions={{headerShown:false}}>
           <Tabs.Screen 
             name='(home)'
-            options={{title : '홈'}}
+            options={{title : '홈11'}}
           />
           <Tabs.Screen 
-            name='profile'
-            options={{title : '프로필'}}
+            name='community'
+            options={{title : '커뮤니티'}}
           />
           <Tabs.Screen 
-            name='search'
-            options={{title : '검색'}}
+            name='follow'
+            options={{title : '팔로우'}}
           />
+        <Tabs.Screen 
+            name='adminDashboard'
+            options={{title : '대쉬보드, 작물리스트'}}
+          />
+          <Tabs.Screen 
+            name='deviceControl'
+            options={{title : '(MQTT)기기제어'}}
+          />
+
         </Tabs>
+        
+        
       </View>
     </SafeAreaView>
   )
