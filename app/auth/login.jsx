@@ -1,10 +1,11 @@
 import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import React, { useState } from "react";
-import CustomInput from "./../../components/common/CustomInput";
-import CustomBotton from "./../../components/common/CustomBotton";
 import { api_login } from "../../apis/memberApi";
+import { router, useRouter } from 'expo-router';
 
 const Login = () => {
+
+  const router = useRouter();
 
   const [loginData, setLoginData] = useState({
     userEmail: "",
@@ -26,6 +27,8 @@ const Login = () => {
         const token = res.headers.authorization;
         console.log(token);
         alert('로그인 성공');
+        // router.push('/home/index');
+        
       })
       .catch((e) => console.log(e));
   };
