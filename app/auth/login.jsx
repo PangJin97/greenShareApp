@@ -17,8 +17,9 @@ const Login = () => {
   const [loginData, setLoginData] = useState({
     userEmail: "",
     userPassword: "",
-    userRole : '',
-    userName : ''
+    userName : "",
+    userRole : ""
+
   });
 
   const loginData1 = (text, name) => {
@@ -32,17 +33,22 @@ const Login = () => {
     api_login(loginData)
       .then((res) => {
         const token = res.headers.authorization;
-
-      SecureStore.setItemAsync('accessToken', token)
-      .then(() => {
-        dispatch(loginReducer(token))
-        router.navigate('/')
+        const user = res.data.user; 
+  
+        SecureStore.setItemAsync('accessToken', token)
+          .then(() => {
+            dispatch(loginReducer({
+              token: token,
+              user: user,
+            }));
+            console.log(loginData);
+            router.navigate('/');
+          })
+          .catch(e => console.log("토큰 저장 오류:", e));
       })
-      .catch(e => console.log(e));
-        
-      })
-      .catch((e) => console.log(e));
+      .catch((e) => console.log("로그인 요청 실패:", e));
   };
+  
   return (
 
     <SafeAreaView style={styles.safearea}>
