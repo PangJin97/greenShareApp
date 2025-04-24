@@ -8,6 +8,8 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { cropList, IMAGE_PATH } from "../../../apis/memberApi";
+import { FlatList } from 'react-native';
+
 
 const ProfileHomeScreen = () => {
   const [list, setList] = useState([]);
