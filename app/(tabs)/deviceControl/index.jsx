@@ -1,7 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const ProfileHomeScreen = () => {
+const DeviceControlScreen = () => {
+  
+  
+
+
+
   return (
     <View>
       <Text>관리자 기기제어</Text>
@@ -9,6 +14,6 @@ const ProfileHomeScreen = () => {
   )
 }
 
-export default ProfileHomeScreen
+export default DeviceControlScreen
 
 const styles = StyleSheet.create({})
