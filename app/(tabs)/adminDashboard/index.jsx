@@ -16,6 +16,9 @@ import { Colors } from "react-native/Libraries/NewAppScreen";
 import { colors } from "../../../constants/colorConstant";
 import CustomText from "./../../../components/common/CustomText";
 import { useRouter } from "expo-router";
+import { FlatList } from 'react-native';
+
+
 
 const ProfileHomeScreen = () => {
   const [list, setList] = useState([]);
