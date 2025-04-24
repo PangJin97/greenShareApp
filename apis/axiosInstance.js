@@ -11,6 +11,9 @@ export const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   async (config) => {
+
+    config.headers.clientType = 'app';
+
     const token = await SecureStore.getItemAsync('accessToken');
 
     //요청시 요청 헤더에 토큰을 담아서 서버에 전달
