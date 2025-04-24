@@ -1,3 +1,4 @@
+
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { Tabs } from 'expo-router'
@@ -7,13 +8,12 @@ import Octicons from '@expo/vector-icons/Octicons';
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 
 
-
-
 const TabLayout = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Header />
       <View style={styles.tabArea}>
+
         <Tabs screenOptions={{headerShown:false}}>
           <Tabs.Screen 
             name='(home)'
@@ -53,20 +53,18 @@ const TabLayout = () => {
           />
 
         </Tabs>
-        
-        
       </View>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default TabLayout
+export default TabLayout;
 
 const styles = StyleSheet.create({
-  container : {
-    flex : 1
+  container: {
+    flex: 1,
   },
-  tabArea : {
-    flex : 1
-  }
-})
+  tabArea: {
+    flex: 1,
+  },
+});
