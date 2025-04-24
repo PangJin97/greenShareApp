@@ -14,8 +14,10 @@ export const api_login = (loginData) => {
 };
 
 export const cropList = () => {
+
   const response = axiosInstance.get('/api/plants');
   // 'http://localhost:8080/images'?
+
   return response;
 };
 

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Platform } from "react-native";
+
 import * as SecureStore from 'expo-secure-store';
 
 
@@ -7,12 +8,15 @@ import * as SecureStore from 'expo-secure-store';
 export const axiosInstance = axios.create({
   baseURL : Platform.OS === 'ios' ? 'http://localhost:8080': 'http://10.0.2.2:8080'
 
+
 });
 
 axiosInstance.interceptors.request.use(
   async (config) => {
 
+
     config.headers.clientType = 'app';
+
 
     const token = await SecureStore.getItemAsync('accessToken');
 
@@ -26,15 +30,6 @@ axiosInstance.interceptors.request.use(
   }
   ,error => Promise.reject(error)
   )
-
-
-
-
-
-
-
-
-
 
 
 
