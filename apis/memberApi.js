@@ -18,8 +18,7 @@ export const api_login = (data) => {
 export const cropList = () => {
   const baseUrl =
     Platform.OS === "ios" ? "http://localhost:8080" : "http://10.0.2.2:8080";
-  const response = axios.get(`${baseUrl}/api/plants`);
-  // 'http://localhost:8080/images'?
+  const response = axios.get(`${baseUrl}/plants`);
   return response;
 };
 
