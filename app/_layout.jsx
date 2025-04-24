@@ -34,18 +34,8 @@ const  AuthManager = ({ children }) => {
         return;
       }
       
-      // 토큰 디코딩 및 만료 확인
-      const decoded = jwtDecode(token);
-      const currentTime = Date.now() / 1000;
-      
-      // 토큰이 만료되었으면 삭제하고 로그아웃
-      if (decoded.exp < currentTime) {
-        await SecureStore.deleteItemAsync('accessToken');
-        dispatch(logoutReducer());
-      } else {
-        // 유효한 토큰이면 로그인 상태로 설정
+       // 유효한 토큰이면 로그인 상태로 설정
         dispatch(loginReducer(token));
-      }
       
     } catch (error) {
       console.error('토큰 검증 중 오류:', error);
