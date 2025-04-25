@@ -58,3 +58,18 @@ export const getUserRoleFromToken = (token) => {
     return null;
   }
 };
+
+
+
+export const getUserNameFromToken = (token) => {
+  if (!token) return null;
+
+  try {
+    const decoded = jwtDecode(token);
+    return decoded?.userName || null;
+  } 
+  catch (error) {
+    console.log('jwtDecode 실패:', error);
+    return null;
+  }
+};
