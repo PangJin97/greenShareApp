@@ -8,6 +8,7 @@ import CustomText from "../../../components/common/CustomText";
 const CropDetail = () => {
   const { cropId } = useLocalSearchParams();
   const [crop, setCrop] = useState({});
+
   useEffect(() => {
     axios
       .get(`http://10.0.2.2:8080/plants/${cropId}`)
