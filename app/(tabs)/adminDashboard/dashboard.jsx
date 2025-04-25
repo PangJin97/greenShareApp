@@ -11,38 +11,48 @@ import { useNavigation } from "@react-navigation/native";
 import CustomText from "../../../components/common/CustomText";
 import { colors } from "../../../constants/colorConstant";
 import { router } from "expo-router";
+import envDetail from "./[envId]";
+import EnvDetail from "./[envId]";
 
 const Dashboard = ({
-  autoRefresh = true,
-  refreshInterval = 5000,
+  /* 대쉬보드 컴포넌트다 */ autoRefresh = true,
+  refreshInterval = 30000,
   customTitle = "환경 센서 요약",
   showStandardInfo = false,
-  cropDetail,
-  id,
+  cropDetail /* 프롭스로 작물의 디테일을 받아옴 */,
+  id /* 프롭스로 작물의 아이디를 받아온다 */,
 }) => {
-  const nav = useNavigation();
-
+  const nav = useNavigation(); /* 컴포넌트 이동을 위한 네비게이션 */
   const [latest, setLatest] = useState({
-    temperature: 0,
+    /* 환경변수를 담아올 변수 */ temperature: 0,
     illuminance: 0,
     humidity: 0,
     soilMoisture: 0,
     joinDate: "",
   });
 
-  const navigation = useNavigation();
-
-  const isTempOk = (v) => v >= cropDetail.tempMin && v <= cropDetail.tempMax;
-  const isHumidOk = (v) => v >= cropDetail.humidMin && v <= cropDetail.humidMax;
-  const isSoilOk = (v) => v >= cropDetail.soilMin && v <= cropDetail.soilMax;
+  const isTempOk = (v) =>
+    v >= cropDetail.tempMin &&
+    v <= cropDetail.tempMax; /* 현재온도와 작물의 적정 온도를 체크할 함수 */
+  const isHumidOk = (v) =>
+    v >= cropDetail.humidMin &&
+    v <= cropDetail.humidMax; /* 현재습도와 작물의 적정 습도를 체크할 함수 */
+  const isSoilOk = (v) =>
+    v >= cropDetail.soilMin &&
+    v <=
+      cropDetail.soilMax; /* 현재토양수분과 작물의 적정 토양수분을 체크할 함수 */
   const isLuxOk = (v) => v >= cropDetail.adcMin && v <= cropDetail.adcMax;
+  /* 현재조도와 작물의 적정 조도를 체크할 함수 */
 
   const fetchData = async () => {
     try {
-      const res = await axios.get("http://10.0.2.2:8080/environment/latest");
+      const res = await axios.get(
+        "http://10.0.2.2:8080/environment/latest"
+      ); /* 가장 최근의 환경데이터 값을 받아올 axios */
       const latestData = res.data;
 
       setLatest({
+        /* 받아온 데이터를 설정해주는 useState */
         temperature: latestData.temperature,
         illuminance: latestData.illuminance,
         humidity: latestData.humidity,
@@ -50,18 +60,18 @@ const Dashboard = ({
         joinDate: new Date(latestData.joinDate).toLocaleTimeString(),
       });
     } catch (err) {
-      console.error("데이터 가져오기 실패:", err);
+      console.error("데이터 가져오기 실패:", err); /* 실패했을때 catch할 함수 */
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData(); /* 데이터를 받아오는 함수 */
     const interval = setInterval(fetchData, refreshInterval);
     return () => clearInterval(interval);
   }, []);
 
-  const handleCardClick = (type) => {
-    navigation.navigate("DetailScreen", { id, type });
+  const handleCardClick = (envId) => {
+    nav.navigate("[envId]", { cropDetail: JSON.stringify(cropDetail), envId });
   };
 
   const renderCard = (label, value, unit, isOk, onClick) => (
@@ -94,16 +104,16 @@ const Dashboard = ({
       </TouchableOpacity>
 
       {renderCard("🌡️ 온도", latest.temperature, "°C", isTempOk, () =>
-        handleCardClick("temperature")
+        handleCardClick("temp")
       )}
       {renderCard("💡 조도", latest.illuminance, "ADC", isLuxOk, () =>
-        handleCardClick("illuminance")
+        handleCardClick("lux")
       )}
       {renderCard("💧 습도", latest.humidity, "%", isHumidOk, () =>
-        handleCardClick("humidity")
+        handleCardClick("humid")
       )}
       {renderCard("🌱 토양", latest.soilMoisture, "%", isSoilOk, () =>
-        handleCardClick("soilMoisture")
+        handleCardClick("soil")
       )}
     </ScrollView>
   );
