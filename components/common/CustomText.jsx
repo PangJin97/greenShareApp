@@ -1,7 +1,14 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-const CustomText = ({ weight = "Regular", style, children, ...props }) => {
+const CustomText = ({
+  weight = "Regular",
+  style,
+  col = "black",
+  size = 15,
+  children,
+  ...props
+}) => {
   const fontMap = {
     Thin: "Pretendard-Thin",
     ExtraLight: "Pretendard-ExtraLight",
@@ -15,7 +22,13 @@ const CustomText = ({ weight = "Regular", style, children, ...props }) => {
   };
 
   return (
-    <Text style={[{ fontFamily: fontMap[weight] }, style]} {...props}>
+    <Text
+      style={[
+        { fontFamily: fontMap[weight], fontSize: size, color: col },
+        style,
+      ]}
+      {...props}
+    >
       {children}
     </Text>
   );
