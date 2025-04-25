@@ -9,7 +9,7 @@ import { logoutReducer } from '../redux/authSlice';
 const Header = () => {
   const router = useRouter();
   const auth = useSelector(state => state.auth); //{token : null, isLogin : false} 
-  
+  const user = useSelector((state) => state.auth.user);
 
   const dispatch = useDispatch();
 
@@ -33,6 +33,7 @@ const Header = () => {
           ? 
           <>
             <Text>{getUserSubFromToken(auth.token)} 님 반갑습니다.</Text>
+
             <Pressable onPress={handleLogout}>
               <Text>Logout</Text>
             </Pressable>
@@ -40,7 +41,7 @@ const Header = () => {
           :
           <>
             <Pressable onPress={() => router.push('/auth/login')}>
-              <Text>Login</Text>
+              <Text >Login</Text>
             </Pressable>
             
             <Pressable onPress={() => router.push('/auth/join')}>
