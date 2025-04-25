@@ -2,12 +2,12 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { Stack } from 'expo-router'
 
-const ProfileLayout = () => {
+const DeviceControlLayout = () => {
   return (
     <Stack screenOptions={{headerShown : false}}/>
   )
 }
 
-export default ProfileLayout
+export default DeviceControlLayout
 
 const styles = StyleSheet.create({})

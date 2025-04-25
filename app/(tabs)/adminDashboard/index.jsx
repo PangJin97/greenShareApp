@@ -10,6 +10,10 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { cropList, IMAGE_PATH } from "../../../apis/memberApi";
+
+
+
+
 import axios from "axios";
 import { useFonts } from "expo-font";
 import { Colors } from "react-native/Libraries/NewAppScreen";
