@@ -1,17 +1,25 @@
 import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import React, { useState } from "react";
 import { api_login } from "../../apis/memberApi";
-import { router, useRouter } from 'expo-router';
+import {  useRouter } from 'expo-router';
+import { useDispatch } from "react-redux";
+import * as SecureStore from 'expo-secure-store';
+import { loginReducer } from '../../redux/authSlice'
+
+
+
 
 const Login = () => {
 
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const [loginData, setLoginData] = useState({
     userEmail: "",
     userPassword: "",
-    userRole : '',
-    userName : ''
+    userName : "",
+    userRole : ""
+
   });
 
   const loginData1 = (text, name) => {
@@ -25,13 +33,22 @@ const Login = () => {
     api_login(loginData)
       .then((res) => {
         const token = res.headers.authorization;
-        console.log(token);
-        alert('로그인 성공');
-        // router.push('/home/index');
-        
+        const user = res.data.user; 
+  
+        SecureStore.setItemAsync('accessToken', token)
+          .then(() => {
+            dispatch(loginReducer({
+              token: token,
+              user: user,
+            }));
+            console.log(loginData);
+            router.navigate('/');
+          })
+          .catch(e => console.log("토큰 저장 오류:", e));
       })
-      .catch((e) => console.log(e));
+      .catch((e) => console.log("로그인 요청 실패:", e));
   };
+  
   return (
 
     <SafeAreaView style={styles.safearea}>
@@ -54,7 +71,7 @@ const Login = () => {
             secureTextEntry
           />
         </View>
-        <TouchableOpacity style={styles.button} onPress={login}>
+        <TouchableOpacity style={styles.button} onPress={login()}>
           <Text style={styles.buttonText}>로그인</Text>
         </TouchableOpacity>
       </View>

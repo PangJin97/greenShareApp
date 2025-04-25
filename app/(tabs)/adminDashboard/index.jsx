@@ -1,5 +1,7 @@
 import {
+  FlatList,
   Image,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -8,80 +10,128 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { cropList, IMAGE_PATH } from "../../../apis/memberApi";
-import { FlatList } from 'react-native';
 
+
+
+
+import axios from "axios";
+import { useFonts } from "expo-font";
+import { Colors } from "react-native/Libraries/NewAppScreen";
+import { colors } from "../../../constants/colorConstant";
+import CustomText from "./../../../components/common/CustomText";
+import { useRouter } from "expo-router";
 
 const ProfileHomeScreen = () => {
   const [list, setList] = useState([]);
+  const [imagePath, setImagePath] = useState(""); // 이미지 경로를 저장할 상태
+  const router = useRouter();
 
   useEffect(() => {
-    cropList()
+    axios
+      .get("http://10.0.2.2:8080/plants")
       .then((res) => {
-        console.log(res);
         setList(res.data);
+        console.log("✅ 서버 응답:");
       })
-      .catch();
+      .catch((err) => {
+        console.error("❌ API 호출 실패:", err.message);
+      });
   }, []);
-  const renderItem = ({ item: crop }) => (
-    <TouchableOpacity
-      style={styles.infoCon}
-      onPress={() => navigation.navigate("PlantDetail", { id: crop.id })}
-    >
-      <View style={styles.picCon}>
-        <Image
-          source={{ uri: `${IMAGE_PATH}/${crop.imgName}` }}
-          style={styles.cropImage}
-        />
-      </View>
 
-      <View style={styles.textCon}>
-        <View style={styles.titleCon}>
-          <Text style={styles.title}>{crop.crop}</Text>
-          <Text style={styles.subtitle}>{crop.engName}</Text>
-        </View>
-
-        <View style={styles.textBox}>
-          <View style={styles.textBoxRow}>
-            <Text style={styles.envLabel}>온도</Text>
-            <Text
-              style={styles.envValue}
-            >{`${crop.tempMin} ~ ${crop.tempMax}℃`}</Text>
-          </View>
-          <View style={styles.textBoxRow}>
-            <Text style={styles.envLabel}>습도</Text>
-            <Text
-              style={styles.envValue}
-            >{`${crop.humidMin} ~ ${crop.humidMax}%`}</Text>
-          </View>
-          <View style={styles.textBoxRow}>
-            <Text style={styles.envLabel}>조도</Text>
-            <Text
-              style={styles.envValue}
-            >{`${crop.adcMin} ~ ${crop.adcMax}`}</Text>
-          </View>
-          <View style={styles.textBoxRow}>
-            <Text style={styles.envLabel}>토양</Text>
-            <Text
-              style={styles.envValue}
-            >{`${crop.soilMin} ~ ${crop.soilMax}%`}</Text>
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
+  useEffect(() => {
+    if (list.length > 0) {
+      console.log("🟢 list 변경됨");
+    }
+  }, [list]);
 
   return (
-    <View style={styles.mainCon}>
-      {/* FlatList */}
-      <FlatList
-        data={list}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
-        numColumns={2}
-        columnWrapperStyle={{ justifyContent: "space-between" }}
-        contentContainerStyle={styles.subCon}
-      />
-    </View>
+    <ScrollView style={styles.mainCon}>
+      {list.map((crop, i) => {
+        return (
+          <TouchableOpacity
+            key={i}
+            style={styles.infoCon}
+            onPress={() => {
+              router.push(
+                `/adminDashboard/${crop.id}`
+              ); /* 선택한 작물로 들어가는 거 */
+            }}
+          >
+            <View style={styles.picCon}>
+              <Image
+                source={{ uri: `http://10.0.2.2:8080/images/${crop.imgName}` }}
+                style={{ width: 200, height: 200 }}
+              />
+            </View>
+
+            <View style={styles.textCon}>
+              {/* 작물 이름 */}
+              <View style={styles.titleCon}>
+                <Text style={[styles.grey, styles.fontBlack, styles.font15]}>
+                  {crop.crop}
+                </Text>
+              </View>
+
+              {/* 생육 환경 */}
+              <View style={styles.textBox}>
+                <View style={styles.textBoxSon}>
+                  <Text style={[styles.green, styles.fontBlack, styles.font08]}>
+                    온도
+                  </Text>
+                  <Text
+                    style={[
+                      styles.white,
+                      styles.fontBlack,
+                      styles.font08,
+                      styles.box,
+                    ]}
+                  >{`${crop.tempMin}~${crop.tempMax}℃`}</Text>
+                </View>
+                <View style={styles.textBoxSon}>
+                  <Text style={[styles.green, styles.fontBlack, styles.font08]}>
+                    습도
+                  </Text>
+                  <CustomText
+                    style={[
+                      styles.white,
+                      styles.fontBlack,
+                      styles.font08,
+                      styles.box,
+                    ]}
+                  >{`${crop.humidMin}~${crop.humidMax}%`}</CustomText>
+                </View>
+                <View style={styles.textBoxSon}>
+                  <Text style={[styles.green, styles.fontBlack, styles.font08]}>
+                    조도(adc)
+                  </Text>
+                  <Text
+                    style={[
+                      styles.white,
+                      styles.fontBlack,
+                      styles.font08,
+                      styles.box,
+                    ]}
+                  >{`${crop.adcMin}~${crop.adcMax}`}</Text>
+                </View>
+                <View style={styles.textBoxSon}>
+                  <Text style={[styles.green, styles.fontBlack, styles.font08]}>
+                    토양
+                  </Text>
+                  <Text
+                    style={[
+                      styles.white,
+                      styles.fontBlack,
+                      styles.font08,
+                      styles.box,
+                    ]}
+                  >{`${crop.soilMin}~${crop.soilMax}%`}</Text>
+                </View>
+              </View>
+            </View>
+          </TouchableOpacity>
+        );
+      })}
+    </ScrollView>
   );
 };
 
@@ -90,100 +140,69 @@ export default ProfileHomeScreen;
 const styles = StyleSheet.create({
   mainCon: {
     width: "100%",
-    paddingHorizontal: 10,
-  },
-  banner: {
-    width: "100%",
-    height: 200,
-    resizeMode: "cover",
-  },
-  subCon: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    marginVertical: 20,
-  },
-  infoCon: {
-    width: "48%",
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 15,
-    marginBottom: 30,
-    padding: 10,
-    backgroundColor: "#fff",
-    elevation: 3, // Android shadow
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.1,
-    shadowRadius: 7,
-  },
-  infoConHover: {
-    shadowOpacity: 0.25,
-    shadowRadius: 14,
+    backgroundColor: "white",
+    paddingHorizontal: 20, // padding을 주면 내용이 부모 영역에 맞게 설정
   },
   picCon: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    overflow: "hidden",
-    justifyContent: "center",
+    /* 이미지 컨테이너 */ width: "100" /* 가로 크기 */,
+    height: "100" /* 세로 크기 */,
+    overflow: "hidden" /* 나가는 부분 자르기 */,
+    justifyContent: "center", // 세로 중앙
     alignItems: "center",
-    marginRight: 10,
   },
-  cropImage: {
-    width: "180%",
-    height: "100%",
-    resizeMode: "cover",
-  },
-  textCon: {
-    flex: 1,
-    height: 100,
-    justifyContent: "space-between",
+  subCon: {
+    width: "100%",
   },
   titleCon: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  infoCon: {
+    flexDirection: "row",
+    width: "100%",
+    height: 120,
+    justifyContent: "space-evenly",
+    backgroundColor: "white",
+    alignItems: "center",
+    borderRadius: 10,
+    boxShadow: "0px 0px 6px lightgray",
     marginBottom: 10,
+    marginTop: 7,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#575757",
-  },
-  subtitle: {
-    fontSize: 12,
-    color: "#575757",
-  },
+  textCon: {},
   textBox: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    width: "100%",
+    width: "240",
     justifyContent: "space-between",
   },
-  textBoxRow: {
-    flexDirection: "column",
-    borderTopWidth: 1,
-    borderTopColor: "#b1b1b1",
-    borderBottomWidth: 1,
-    borderBottomColor: "#b1b1b1",
-    paddingVertical: 5,
-    marginBottom: 5,
-    width: "48%",
+  textBoxSon: {},
+
+  font08: {
+    /*  폰트사이즈 작게 */ fontSize: 12,
   },
-  envLabel: {
-    paddingLeft: 5,
-    marginBottom: 5,
-    color: "#27b06e",
+  font15: {
+    fontSize: 18,
   },
-  envValue: {
-    backgroundColor: "#27b06e",
-    color: "white",
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    textAlign: "center",
-  },
-  fontBold: {
-    fontWeight: "900", // Pretendard-Black 대체
-  },
+
   fontLight: {
-    fontWeight: "300", // Pretendard-Light 대체
+    /* 폰트 라이트 */ fontFamily: "Pretendard-light",
+  },
+
+  fontBlack: {
+    /* 폰트 블랙 */ fontFamily: "Pretendard-Black",
+  },
+
+  green: {
+    /* 폰트컬러 메인그린 */ color: colors.MAIN,
+  },
+
+  white: {
+    color: "white",
+  },
+  box: {
+    backgroundColor: colors.MAIN,
+    paddingHorizontal: 3,
+    borderRadius: 5,
+    justifyContent: "center",
   },
 });
