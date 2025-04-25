@@ -37,7 +37,7 @@ export default function DeviceControl() {
       <Text style={styles.header}> 라즈베리파이 제어</Text>
 
       {/* 센서 데이터 요청 버튼 */}
-      <Button title="센서 데이터 불러오기" onPress={getSensorData} />
+      <Button title="최신 센서 데이터 불러오기" onPress={getSensorData} />
 
       {/* 최신 데이터 화면에 표시 */}
       {sensor && (
