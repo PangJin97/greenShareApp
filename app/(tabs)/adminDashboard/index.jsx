@@ -16,9 +16,6 @@ import { Colors } from "react-native/Libraries/NewAppScreen";
 import { colors } from "../../../constants/colorConstant";
 import CustomText from "./../../../components/common/CustomText";
 import { useRouter } from "expo-router";
-import { FlatList } from 'react-native';
-
-
 
 const ProfileHomeScreen = () => {
   const [list, setList] = useState([]);
@@ -51,7 +48,9 @@ const ProfileHomeScreen = () => {
             key={i}
             style={styles.infoCon}
             onPress={() => {
-              router.push(`/adminDashboard/${crop.id}`);
+              router.push(
+                `/adminDashboard/${crop.id}`
+              ); /* 선택한 작물로 들어가는 거 */
             }}
           >
             <View style={styles.picCon}>
