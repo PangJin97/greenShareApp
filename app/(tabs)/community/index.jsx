@@ -1,14 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Alert,
-  Image,
-  ScrollView,
-  ActivityIndicator,
-  Dimensions
-} from "react-native";
+import {View,Text,StyleSheet,Alert,Image,ScrollView,ActivityIndicator,Dimensions,} from "react-native";
 import { getStories } from "../../../apis/plantStory";
 
 // ✅ 화면 너비 가져오기 (스타일 밖에서 선언)
@@ -87,11 +78,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 16,
   },
- 
+
   loader: {
     marginTop: 20,
   },
 });
-
 
 export default ProfileHomeScreen;
