@@ -1,17 +1,12 @@
-
-
-
-
-import logo from "@/assets/images/greenshare.png";
+import logo from "./../assets/images/greenshare.png";
 import { startMapper } from "react-native-reanimated";
-import { Pressable, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import { useRouter } from 'expo-router'
-import { useDispatch, useSelector } from 'react-redux';
-import { getUserNameFromToken, getUserSubFromToken } from '../redux/authHelper';
-import * as SecureStore from 'expo-secure-store';
-import { logoutReducer } from '../redux/authSlice';
-
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import React from "react";
+import { useRouter } from "expo-router";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserNameFromToken, getUserSubFromToken } from "../redux/authHelper";
+import * as SecureStore from "expo-secure-store";
+import { logoutReducer } from "../redux/authSlice";
 
 const Header = () => {
   const router = useRouter();
