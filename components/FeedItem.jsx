@@ -19,7 +19,10 @@ const FeedItem = ({ item }) => {
   useEffect(() => {}, [isLike]);
   return (
     <View style={styles.feedCon}>
-      <Profile writer={item.writer} createData={item.createData} />
+
+      {/* 피드 컨테이너 */}
+      <Profile writer={item.writer} regData={item.regData} />
+
       <CustomText weight="Bold" size={15}>
         {item.title}
       </CustomText>
@@ -34,16 +37,16 @@ const FeedItem = ({ item }) => {
             color="red"
           />
           <CustomText weight="Light" style={isLike && { color: "red" }}>
-            1
+            {item.likeCnt}
           </CustomText>
         </Pressable>
         <Pressable style={styles.flexRow}>
           <Octicons name="comment" size={16} color="black" />
-          <CustomText weight="Light">1</CustomText>
+          <CustomText weight="Light">{item.replyCnt}</CustomText>
         </Pressable>
         <Pressable style={styles.flexRow}>
           <MaterialCommunityIcons name="eye-outline" size={16} color="black" />
-          <CustomText weight="Light">1</CustomText>
+          <CustomText weight="Light">{item.readCnt}</CustomText>
         </Pressable>
       </View>
     </View>
