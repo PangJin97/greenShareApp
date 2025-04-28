@@ -17,6 +17,8 @@ import {
 } from "../../../redux/authHelper";
 import * as SecureStore from "expo-secure-store";
 import Icon from "react-native-vector-icons/FontAwesome"; // FontAwesome 아이콘 사용
+import Toast from 'react-native-toast-message';  // Toast import
+
 
 // 화면 너비 가져오기
 const screenWidth = Dimensions.get("window").width;
@@ -57,16 +59,15 @@ const ProfileHomeScreen = () => {
       setLoading(true);
       try {
         const response = await getStories(); // API 호출
-        setBoardList(response.data); // 상태 업데이트
+        setBoardList(response.data); // 상태 업데이트 (isLike가 각 항목에 포함되어 있어야 함)
       } catch (error) {
-        console.error(error);
-        Alert.alert("오류", "게시물 목록을 가져오는 데 실패했습니다.");
+        alert("오류", "게시물 목록을 가져오는 데 실패했습니다.");
       } finally {
         setLoading(false); // 로딩 종료
       }
     };
 
-    fetchStories(); // 실행
+    fetchStories();
   }, []);
 
   // HTML 콘텐츠에서 이미지 URL만 추출하는 함수
@@ -82,37 +83,48 @@ const ProfileHomeScreen = () => {
 
   // 좋아요 처리 함수
   const handleLikeToggle = async (boardNum) => {
+    // 로그인 상태 확인
     const token = await SecureStore.getItemAsync("accessToken");
-    if (!isAuthenticated(token)) {
-      alert("로그인이 필요합니다.");
-      return;
+    if (!token) {
+      // 로그인되지 않았으면 Toast 메시지로 알림
+      Toast.show({
+        type: 'error',  // 에러 메시지
+        position: 'top', // 상단에 표시
+        text1: '로그인 필요',  // 제목
+        text2: '좋아요를 누르려면 로그인해야 합니다.'  // 내용
+      });
+      return; // 로그인되지 않았으면 좋아요를 눌러도 아무 동작이 일어나지 않음
     }
+
     if (likeLoading[boardNum]) return; // 요청 중이면 클릭 무효화
 
-    setLikeLoading((prev) => ({ ...prev, [boardNum]: true }));
+    setLikeLoading((prev) => ({ ...prev, [boardNum]: true })); // 로딩 상태 시작
 
     try {
-      // 게시물의 현재 좋아요 상태 확인
-      const currentLikeStatus = boardList.find(
-        (item) => item.boardNum === boardNum
-      ).isLike === "Y"; // 'Y'는 좋아요 상태, 'N'은 비활성화 상태
+      // boardList에서 boardNum에 해당하는 게시물 찾기
+      const currentBoard = boardList.find((item) => item.boardNum === boardNum);
 
-      if (currentLikeStatus) {
+      if (!currentBoard) return; // 게시물이 없으면 종료
+
+      const currentIsLike = currentBoard.isLike; // 해당 게시물의 좋아요 상태
+
+      if (currentIsLike === "Y") {
         // 좋아요 취소
-        await removeLike(boardNum); // deleteLike는 서버에서 좋아요를 취소하는 API 호출 함수
+        await removeLike(boardNum);
       } else {
         // 좋아요 추가
-        await insertLike(boardNum); // addLike는 서버에서 좋아요를 추가하는 API 호출 함수
+        await insertLike(boardNum);
       }
 
-      // 게시물의 좋아요 상태와 카운트 업데이트
+      // 게시물 목록에서 해당 게시물 좋아요 상태 및 카운트 업데이트
       setBoardList((prevList) =>
         prevList.map((item) =>
           item.boardNum === boardNum
             ? {
                 ...item,
-                isLike: currentLikeStatus ? "N" : "Y", // 좋아요 상태 토글
-                likeCnt: currentLikeStatus ? item.likeCnt - 1 : item.likeCnt + 1, // 좋아요 카운트 업데이트
+                isLike: currentIsLike === "Y" ? "N" : "Y", // 좋아요 상태 토글
+                likeCnt:
+                  currentIsLike === "Y" ? item.likeCnt - 1 : item.likeCnt + 1, // 좋아요 카운트 업데이트
               }
             : item
         )
@@ -171,6 +183,7 @@ const ProfileHomeScreen = () => {
           keyExtractor={(item) => item.boardNum.toString()}
         />
       )}
+      <Toast ref={(ref) => Toast.setRef(ref)} />
     </View>
   );
 };
