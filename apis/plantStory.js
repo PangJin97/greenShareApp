@@ -23,4 +23,3 @@ export const deleteLike = async (boardNum) => {
   return response.data; 
 };
 
-//async는 비동기작업이라는 뜻으로 await는 실행될때까지 기다린다는 의미

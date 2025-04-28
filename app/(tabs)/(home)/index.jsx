@@ -7,8 +7,10 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { colors } from "../../../constants/colorConstant";
 import FeedItem from "../../../components/FeedItem";
 import { dummyData } from "../../../apis/dummyData";
+import { router, useRouter } from "expo-router";
 
 const HomeScreen = () => {
+  const router = useRouter();
   const data = dummyData;
   return (
     <View style={styles.con}>
@@ -23,7 +25,7 @@ const HomeScreen = () => {
         }}
         contentContainerStyle={styles.listCon}
       />
-      <Pressable style={styles.writeBtn}>
+      <Pressable style={styles.writeBtn} onPress={()=>{router.push('/community/reg-commu')}}>
         <Octicons name="pencil" size={24} color="white" />
       </Pressable>
     </View>
