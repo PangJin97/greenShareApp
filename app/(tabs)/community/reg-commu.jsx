@@ -1,5 +1,3 @@
-// app/community/FarmerCommunityInsert.tsx
-
 import React, { useRef, useState } from "react";
 import {
   View,
@@ -18,7 +16,7 @@ import {
 } from "react-native-pell-rich-editor";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
-import { axiosInstance } from "../../../apis/axiosInstance"; // 본인 API에 맞춰 경로 조정
+import { axiosInstance } from "../../../apis/axiosInstance";
 
 const FarmerCommunityInsert = () => {
   const router = useRouter();
@@ -29,46 +27,51 @@ const FarmerCommunityInsert = () => {
 
   const imageHandler = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images', 'videos'],
+      mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
 
-    // if (!result.canceled && result.assets?.[0]?.uri) {
-    //   const imageUri = result.assets[0].uri;
+    if (!result.canceled && result.assets?.[0]?.uri) {
+      const imageUri = result.assets[0].uri;
 
-    //   const manipulated = await ImageManipulator.manipulate(
-    //     imageUri,
-    //     [{ resize: { width: 1024 } }],
-    //     {
-    //       compress: 0.8,
-    //       format: ImageManipulator.SaveFormat.JPEG,
-    //       base64: true,
-    //     }
-    //   );
+      const manipulated = await ImageManipulator.manipulateAsync(
+        imageUri,
+        [{ resize: { width: 1024 } }],
+        {
+          compress: 0.8,
+          format: ImageManipulator.SaveFormat.JPEG,
+          base64: true,
+        }
+      );
 
-    //   const base64Image = `data:image/jpeg;base64,${manipulated.base64}`;
-    //   editorRef.current?.insertHTML(`<img src="${base64Image}" />`);
-    // }
+      const base64Image = `data:image/jpeg;base64,${manipulated.base64}`;
+      editorRef.current?.insertHTML(
+        `<img src="${base64Image}" style="max-width:100%;height:auto;" />`
+      );
+    }
   };
 
-  const sendInsert = () => {
+  const sendInsert = async () => {
     if (!title.trim() || !content.trim()) {
       Alert.alert("알림", "제목과 내용을 모두 입력해 주세요.");
       return;
     }
 
-    axiosInstance
-      .post("/plantStories", { title, content })
-      .then(() => {
-        Alert.alert("성공", "게시글이 등록되었습니다!");
-        router.push("/community");
-      })
-      .catch((error) => {
-        console.error("등록 오류:", error);
-        Alert.alert("에러", "등록 중 오류가 발생했습니다.");
-      });
+    try {
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("content", content);
+
+      await axiosInstance.post("/plantStories", formData); 
+
+      Alert.alert("성공", "게시글이 등록되었습니다!");
+      router.push("/community");
+    } catch (error) {
+      console.error("등록 오류:", error.response?.data || error.message);
+      Alert.alert("에러", "등록 중 오류가 발생했습니다.");
+    }
   };
 
   return (
@@ -84,18 +87,17 @@ const FarmerCommunityInsert = () => {
           onChangeText={setTitle}
         />
       </View>
- 
-      {/* <RichEditor
+
+      <RichEditor
         ref={editorRef}
         initialContentHTML=""
         placeholder="내용을 입력하세요"
         style={styles.editor}
+        initialHeight={400}
         onChange={(html) => setContent(html)}
-      />  */}
+      />
 
-
-
-       <RichToolbar
+      <RichToolbar
         editor={editorRef}
         actions={[
           actions.insertImage,
@@ -103,8 +105,8 @@ const FarmerCommunityInsert = () => {
           actions.setItalic,
           actions.setUnderline,
         ]}
-        insertImage={imageHandler}
-      /> 
+        onPressAddImage={imageHandler}
+      />
 
       <View style={styles.btnContainer}>
         <Button title="목록 가기" onPress={() => router.push("/community")} />
@@ -145,7 +147,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 8,
     marginBottom: 12,
-    minHeight: 400,
+    height: 400,
   },
   btnContainer: {
     marginTop: 20,
