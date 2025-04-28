@@ -27,3 +27,4 @@ export const removeLike = async (disLike) => {
     throw error; // 실패 시 에러 던짐
   }
 };
+
