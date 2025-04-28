@@ -4,7 +4,7 @@ import CustomText from "./common/CustomText";
 import face from "@/assets/images/face-01.jpg";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-const Profile = ({ writer, createData }) => {
+const Profile = ({ writer, regData }) => {
   /* 프로필영역 컴포넌트 */
   return (
     <View style={styles.con}>
@@ -17,7 +17,7 @@ const Profile = ({ writer, createData }) => {
             {writer}
           </CustomText>
           <CustomText weight="Light" size={11}>
-            {createData}
+            {regData}
           </CustomText>
         </View>
       </View>

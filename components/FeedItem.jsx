@@ -20,7 +20,7 @@ const FeedItem = ({ item }) => {
   return (
     <View style={styles.feedCon}>
       {/* 피드 컨테이너 */}
-      <Profile writer={item.writer} createData={item.createData} />
+      <Profile writer={item.writer} regData={item.regData} />
       {/* 프로필 컴포넌트 */}
       <CustomText weight="Bold" size={15}>
         {/* 글제목 */}
@@ -41,18 +41,18 @@ const FeedItem = ({ item }) => {
             color="red"
           />
           <CustomText weight="Light" style={isLike && { color: "red" }}>
-            1
+            {item.likeCnt}
           </CustomText>
         </Pressable>
         <Pressable style={styles.flexRow}>
           {/* 댓글부분 */}
           <Octicons name="comment" size={16} color="black" />
-          <CustomText weight="Light">1</CustomText>
+          <CustomText weight="Light">{item.replyCnt}</CustomText>
         </Pressable>
         <Pressable style={styles.flexRow}>
           {/* 조회수 */}
           <MaterialCommunityIcons name="eye-outline" size={16} color="black" />
-          <CustomText weight="Light">1</CustomText>
+          <CustomText weight="Light">{item.readCnt}</CustomText>
         </Pressable>
       </View>
     </View>
