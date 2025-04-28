@@ -2,7 +2,7 @@ export const dummyData = [
   {
     id: 1,
     writer: "abc",
-    createData: "2025-04-25",
+    regData: "2025-04-25",
     title: "제목입니다1",
     content: "내용입니다1",
     likeCnt: 5,
@@ -12,7 +12,7 @@ export const dummyData = [
   {
     id: 2,
     writer: "abc",
-    createData: "2025-04-25",
+    regData: "2025-04-25",
     title: "제목입니다2",
     content: "내용입니다2",
     likeCnt: 5,
@@ -22,7 +22,7 @@ export const dummyData = [
   {
     id: 3,
     writer: "abc",
-    createData: "2025-04-25",
+    regData: "2025-04-25",
     title: "제목입니다3",
     content: "내용입니다3",
     likeCnt: 5,
@@ -32,7 +32,7 @@ export const dummyData = [
   {
     id: 4,
     writer: "abc",
-    createData: "2025-04-25",
+    regData: "2025-04-25",
     title: "제목입니다4",
     content: "내용입니다4",
     likeCnt: 5,
@@ -42,7 +42,7 @@ export const dummyData = [
   {
     id: 5,
     writer: "abc",
-    createData: "2025-04-25",
+    regData: "2025-04-25",
     title: "제목입니다5",
     content: "내용입니다5",
     likeCnt: 5,
