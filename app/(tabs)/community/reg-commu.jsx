@@ -60,11 +60,10 @@ const FarmerCommunityInsert = () => {
     }
 
     try {
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("content", content);
-
-      await axiosInstance.post("/plantStories", formData); 
+      await axiosInstance.post("/plantStories", {
+        title: title,
+        content: content,
+      });
 
       Alert.alert("성공", "게시글이 등록되었습니다!");
       router.push("/community");
