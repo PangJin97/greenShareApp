@@ -1,22 +1,18 @@
 import React, { useEffect } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native'; // Button → Pressable로 변경
 import axios from 'axios';
-import Toast from 'react-native-toast-message'; // ✅ Toast 추가
+import Toast from 'react-native-toast-message';
 
 // Flask 서버 주소
 const RPI_BASE_URL = 'http://192.168.30.235:5000';
 
-// 기기 제어 컴포넌트
 export default function DeviceControl({ cropId }) {
   
-  // cropId가 변경될 때마다 서버에 cropId 전달
   useEffect(() => {
     const updateCropId = async () => {
       try {
         if (cropId) {
-          await axios.get(`${RPI_BASE_URL}/sensor`, {
-            params: { cropId },
-          });
+          await axios.get(`${RPI_BASE_URL}/sensor`, { params: { cropId } });
           console.log(`✅ cropId ${cropId} 서버로 전달 완료`);
         }
       } catch (err) {
@@ -26,7 +22,6 @@ export default function DeviceControl({ cropId }) {
     updateCropId();
   }, [cropId]);
 
-  // LED 제어 함수
   const controlLED = async (state) => {
     try {
       await axios.post(`${RPI_BASE_URL}/led`,
@@ -36,7 +31,7 @@ export default function DeviceControl({ cropId }) {
       Toast.show({
         type: 'success',
         text1: `LED ${state === 'on' ? '켜짐' : '꺼짐'}`,
-        position : 'top'
+        position: 'top'
       });
     } catch (err) {
       console.log('LED 제어 실패', err.message);
@@ -44,22 +39,24 @@ export default function DeviceControl({ cropId }) {
         type: 'error',
         text1: 'LED 제어 실패',
         text2: err.message,
-        position : 'top',
+        position: 'top',
       });
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>기기 제어</Text>
+      <Text style={styles.header}>🌱 기기 제어</Text>
 
-      {/* LED 제어 버튼 */}
       <View style={styles.btnRow}>
-        <Button title="LED 켜기" onPress={() => controlLED('on')} />
-        <Button title="LED 끄기" onPress={() => controlLED('off')} />
+        <Pressable style={styles.button} onPress={() => controlLED('on')}>
+          <Text style={styles.buttonText}>LED 켜기</Text>
+        </Pressable>
+        <Pressable style={styles.button} onPress={() => controlLED('off')}>
+          <Text style={styles.buttonText}>LED 끄기</Text>
+        </Pressable>
       </View>
 
-      {/* Toast 컴포넌트 등록 */}
       <Toast />
     </View>
   );
@@ -69,17 +66,33 @@ export default function DeviceControl({ cropId }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 24,
     justifyContent: 'center',
+    backgroundColor: '#F9FBF7', // 연한 초록-아이보리 톤 배경
   },
   header: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    color: '#4CAF50', // 식물 느낌의 초록색
+    textAlign: 'center',
+    marginBottom: 24,
   },
   btnRow: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 20,
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  button: {
+    backgroundColor: '#81C784', // 연한 초록색 버튼
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12, // 둥글둥글
+    elevation: 2, // 살짝 그림자
+  },
+  buttonText: {
+    fontSize: 16,
+    color: 'white',
+    fontWeight: '600',
   },
 });
