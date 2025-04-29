@@ -1,33 +1,45 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { Link, useRouter } from "expo-router"; // 여기서는 expo-router의 Link를 사용해야 합니다.
+import * as SecureStore from "expo-secure-store";
+import Prac from "./../app/(tabs)/follow/Prac";
 import { useNavigation } from "@react-navigation/native";
 
 const MessageButton = ({ receiver }) => {
-  const [sender, setSender] = useState(null); /* 보내는 사람 설정 */
-  const auth = useSelector((state) => state.auth);
-  /* 보내는 사람을 알아내기 위해 토큰에서 아이디를 가져오기 위한 uesSelector */
-  const navigation = useNavigation(); // 네비게이션 hook 사용
+  const navigation = useNavigation();
+  const [sender, setSender] = useState(null);
 
-  useEffect(() => {
+  const getUserEmailFromToken = async () => {
     try {
-      // 로그인이 되어있을 시 sender 설정
-      auth.token && setSender(getUserSubFromToken(auth.token));
-    } catch {
-      console.error("Error occurred while setting sender:", error);
-      alert("로그인을 해주세요");
-    }
-  }, [auth.token]); /* 보내는 사람 설정 */
+      const token = await SecureStore.getItemAsync("accessToken");
+      if (!token) return null;
 
-  const navChat = () => {
-    if (sender && receiver) {
-      navigation.navigate("WebSocketClient", { sender, receiver }); // sender와 receiver 파라미터 전달
+      const payload = token.split(".")[1]; // JWT 페이로드 추출
+      const decoded = JSON.parse(atob(payload)); // Base64 디코딩 후 JSON 파싱
+
+      setSender(decoded.sub); // sender 상태 업데이트
+      return decoded.sub || null; // 이메일 필드가 있다면 반환, 없으면 null 반환
+    } catch (error) {
+      console.error("토큰 디코딩 오류:", error);
+      return null;
     }
   };
 
+  const goToPrac = () => {
+    // `push`를 사용하여 쿼리 파라미터와 함께 이동
+    navigation.navigate("WebSocketClient", { sender, receiver });
+  };
+
+  useEffect(() => {
+    getUserEmailFromToken();
+  }, []); // 빈 배열을 의존성으로 사용하여 한 번만 실행
+
   return (
-    <Pressable onPress={navChat}>
-      <Text>{receiver}와 대화하기</Text>
-    </Pressable>
+    <>
+      <Pressable onPress={goToPrac}>
+        <Text>실험용 버튼</Text>
+      </Pressable>
+    </>
   );
 };
 
