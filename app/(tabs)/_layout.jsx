@@ -68,27 +68,7 @@ const TabLayout = () => {
               ),
             }}
           />
-
-          <Tabs.Screen
-            name="deviceControl"
-            options={{
-              title: "(MQTT)기기제어",
-              tabBarIcon: () => (
-                <Octicons name="device-mobile" size={24} color="black" />
-              ),
-            }}
-            listeners={{
-              tabPress: (e) => {
-                if (!checkAuthForTab("deviceControl")) {
-                  // 기본 탭 이벤트 방지
-                  e.preventDefault();
-                  // 로그인 페이지로 이동
-                  router.push("/auth/login");
-                }
-              },
-            }}
-          />
-
+  
           <Tabs.Screen
             name="follow"
             options={{
