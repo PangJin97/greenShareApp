@@ -20,12 +20,9 @@ const HomeScreen = () => {
         renderItem={({ item }) => (
           <FeedItem item={item} />
         )} /* 매개변수가 하나씩 뽑아서 쓰는 데이터명 */
-        keyExtractor={(item) => {
-          item.id.toString();
-        }}
+        keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listCon}
       />
-      
     </View>
   );
 };

@@ -1,5 +1,4 @@
-// DeviceControl.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import axios from 'axios';
 
@@ -8,8 +7,7 @@ const RPI_BASE_URL = 'http://192.168.30.235:5000';
 
 // 기기 제어 컴포넌트
 export default function DeviceControl({ cropId }) {
-  const [sensor, setSensor] = useState(null);
-
+  
   // cropId가 변경될 때마다 서버에 cropId 전달
   useEffect(() => {
     const updateCropId = async () => {
@@ -27,19 +25,7 @@ export default function DeviceControl({ cropId }) {
     updateCropId();
   }, [cropId]);
 
-  // 센서 데이터 수동 조회
-  const getSensorData = async () => {
-    try {
-      const res = await axios.get(`${RPI_BASE_URL}/sensor`, {
-        params: { cropId },
-      });
-      setSensor(res.data);
-    } catch (err) {
-      console.log('센서 데이터 요청 실패', err.message);
-    }
-  };
-
-  // LED 제어
+  // LED 제어 함수
   const controlLED = async (state) => {
     try {
       await axios.post(`${RPI_BASE_URL}/led`,
@@ -54,19 +40,7 @@ export default function DeviceControl({ cropId }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>센서 수동 제어</Text>
-
-      <Button title="최신 센서 데이터 불러오기" onPress={getSensorData} />
-
-      {/* 센서 데이터 표시 */}
-      {sensor && (
-        <View style={styles.box}>
-          <Text>🌡️ 온도: {sensor.temp} °C</Text>
-          <Text>💧 습도: {sensor.humidity} %</Text>
-          <Text>💡 조도: {sensor.light}</Text>
-          <Text>🌱 토양 수분: {sensor.soil} %</Text>
-        </View>
-      )}
+      <Text style={styles.header}>기기 제어</Text>
 
       {/* LED 제어 버튼 */}
       <View style={styles.btnRow}>
@@ -88,9 +62,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
-  },
-  box: {
-    marginTop: 20,
   },
   btnRow: {
     flexDirection: 'row',
