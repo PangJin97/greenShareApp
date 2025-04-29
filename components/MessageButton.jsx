@@ -44,5 +44,3 @@ const MessageButton = ({ receiver }) => {
 };
 
 export default MessageButton;
-
-const styles = StyleSheet.create({});
