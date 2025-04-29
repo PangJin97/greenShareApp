@@ -1,0 +1,175 @@
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  Alert,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { getDetailStories, upDateStories } from '../../../../apis/plantStory';
+import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor'; // ✨ 추가
+
+const EditScreen = () => {
+  const { boardNum } = useLocalSearchParams();
+  const router = useRouter();
+  const editorRef = useRef(null); // ✨ 에디터 ref
+
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        if (!boardNum || isNaN(Number(boardNum))) {
+          throw new Error('유효하지 않은 boardNum입니다.');
+        }
+
+        const res = await getDetailStories(Number(boardNum));
+
+        if (!res?.data) {
+          throw new Error('게시글 데이터를 받지 못했습니다.');
+        }
+
+        setTitle(res.data.title || '');
+        setContent(res.data.content || ''); // ✨ content 원본 유지 (HTML 삭제 안 함)
+      } catch (error) {
+        console.error('게시글 불러오기 실패:', error);
+        Alert.alert('오류', '게시글을 불러오지 못했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [boardNum]);
+
+  const handleSave = async () => {
+    if (!title.trim() || !content.trim()) {
+      Alert.alert('입력 확인', '제목과 내용을 모두 입력해주세요.');
+      return;
+    }
+
+    try {
+      await upDateStories(Number(boardNum), { title, content });
+      Alert.alert('수정 완료', '게시글이 수정되었습니다.');
+      router.replace(`/community/detail?boardNum=${boardNum}`);
+    } catch (error) {
+      console.error('게시글 수정 실패:', error.response?.data || error.message);
+      Alert.alert('수정 실패', '게시글 수정 중 오류가 발생했습니다.');
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#007bff" />
+        <Text style={styles.loadingText}>불러오는 중...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView style={styles.container}>
+      <Text style={styles.header}>게시글 수정</Text>
+
+      <Text style={styles.label}>제목</Text>
+      <TextInput
+        style={styles.input}
+        value={title}
+        onChangeText={setTitle}
+        placeholder="제목을 입력하세요"
+      />
+
+      <Text style={styles.label}>내용</Text>
+
+      <View style={styles.editorContainer}>
+        <RichEditor
+          ref={editorRef}
+          initialContentHTML={content} // ✨ 기존 HTML 넣기
+          onChange={(html) => setContent(html)} // ✨ 수정되면 저장
+          placeholder="내용을 입력하세요"
+          style={styles.editor}
+          initialHeight={300}
+        />
+      </View>
+
+      <RichToolbar
+        editor={editorRef}
+        actions={[
+          actions.insertImage,
+          actions.setBold,
+          actions.setItalic,
+          actions.setUnderline,
+        ]}
+        style={styles.toolbar}
+      />
+
+      <Button title="저장하기" onPress={handleSave} />
+    </ScrollView>
+  );
+};
+
+export default EditScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#555',
+    marginTop: 12,
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 20,
+    marginBottom: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: '#f9f9f9',
+  },
+  editorContainer: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginBottom: 20,
+  },
+  editor: {
+    flex: 1,
+    minHeight: 300,
+    fontSize: 16,
+    padding: 10,
+  },
+  toolbar: {
+    backgroundColor: '#eee',
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+});

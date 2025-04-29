@@ -1,4 +1,7 @@
 import { axiosInstance } from "./axiosInstance";
+import * as SecureStore from 'expo-secure-store'
+
+
 
 // 식물 커뮤니티 조회 API
 export const getStories = async () => {
@@ -38,11 +41,21 @@ export const deleteStories = async (boardNum) => {
   return response.data; 
 };
 
-// 식물 커뮤티니 삭제
-export const upDateStories = async (boardNum) => {
-  const response = await axiosInstance.delete(
-    `/plantStories/${boardNum}`
+// 식물 커뮤티니 수정
+export const upDateStories = async (boardNum, updateData) => {
+  const token = await SecureStore.getItemAsync("accessToken");
+
+  const response = await axiosInstance.put(
+    `/plantStories/${boardNum}`,
+    updateData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`, // ✅ 필수!
+      },
+    }
   );
-  return response.data; 
+
+  return response.data;
 };
+
 
