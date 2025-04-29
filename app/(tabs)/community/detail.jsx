@@ -11,8 +11,6 @@ const DetailScreen = () => {
   const router = useRouter();
   const screenWidth = Dimensions.get('window').width;
 
-
-
   const customRenderers = {
     img: ({ tnode }) => {
       const imageUri = tnode.attributes.src;
@@ -48,8 +46,6 @@ const DetailScreen = () => {
     };
     fetchDetail();
   }, [boardNum]);
-
-  
 
   const handleDelete = async () => {
     Alert.alert(
@@ -99,50 +95,46 @@ const DetailScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
-      {/* 제목 */}
-      <Text style={styles.title}>{detailData.title || '제목 없음'}</Text>
+      <View style={styles.card}>
+        <Text style={styles.title}>{detailData.title || '제목 없음'}</Text>
 
-      {/* 작성자, 등록일, 조회수 */}
-      <View style={styles.metaInfo}>
-        <Text style={styles.metaText}>작성자: {detailData.userEmail || '작성자 없음'}</Text>
-        <Text style={styles.metaText}>등록일: {detailData.regDate || '등록일 없음'}</Text>
-        <Text style={styles.metaText}>조회수: {detailData.readCnt ?? '0'}</Text>
-      </View>
+        <View style={styles.metaInfo}>
+          <Text style={styles.metaText}>작성자: {detailData.userEmail || '작성자 없음'}</Text>
+          <Text style={styles.metaText}>등록일: {detailData.regDate || '등록일 없음'}</Text>
+          <Text style={styles.metaText}>조회수: {detailData.readCnt ?? '0'}</Text>
+        </View>
 
-      {/* 본문 내용 */}
-      <View style={styles.contentArea}>
-        {detailData.content ? (
-          <RenderHtml
-            contentWidth={screenWidth}
-            source={{ html: detailData.content }}
-            renderers={customRenderers}
-          />
-        ) : (
-          <Text>내용 없음</Text>
-        )}
-      </View>
+        <View style={styles.contentArea}>
+          {detailData.content ? (
+            <RenderHtml
+              contentWidth={screenWidth}
+              source={{ html: detailData.content }}
+              renderers={customRenderers}
+            />
+          ) : (
+            <Text>내용 없음</Text>
+          )}
+        </View>
 
-      {/* 수정/삭제 버튼 */}
-      <View style={styles.buttonGroup}>
-        <Pressable style={styles.editBtn} onPress={handleEdit}>
-          <Text style={styles.btnText}>수정</Text>
-        </Pressable>
-        <Pressable style={styles.deleteBtn} onPress={handleDelete}>
-          <Text style={styles.btnText}>삭제</Text>
-        </Pressable>
+        <View style={styles.buttonGroup}>
+          <Pressable style={styles.editBtn} onPress={handleEdit}>
+            <Text style={styles.btnText}>수정</Text>
+          </Pressable>
+          <Pressable style={styles.deleteBtn} onPress={handleDelete}>
+            <Text style={styles.btnText}>삭제</Text>
+          </Pressable>
+        </View>
       </View>
-      
     </ScrollView>
   );
 };
 
 export default DetailScreen;
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#eef6f7', // 살짝 밝은 배경
     padding: 16,
   },
   center: {
@@ -156,67 +148,77 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#555',
   },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    marginBottom: 20,
+  },
   title: {
     fontSize: 26,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 12,
+    textAlign: 'center',
   },
   metaInfo: {
-    marginBottom: 20,
+    marginBottom: 16,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderColor: '#eee',
   },
   metaText: {
     fontSize: 14,
     color: '#777',
     marginBottom: 4,
+    textAlign: 'center',
   },
   contentArea: {
     marginBottom: 30,
+    paddingHorizontal: 8,
+    paddingVertical: 12,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   buttonGroup: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 30,
-    gap: 12, // (React Native 0.71 이상) 버튼 간격
+    justifyContent: 'space-around',
+    marginTop: 20,
   },
-  
   editBtn: {
-    flex: 1,
-    backgroundColor: '#007bff',
-    paddingVertical: 14,
+    width: '45%',
+    backgroundColor: '#90ee90',
+    paddingVertical: 12,
     borderRadius: 10,
     alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 8, 
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.15,
     shadowRadius: 3,
-    elevation: 4, // Android 전용 그림자
+    elevation: 3,
   },
-  
   deleteBtn: {
-    flex: 1,
-    backgroundColor: '#dc3545',
-    paddingVertical: 14,
+    width: '45%',
+    backgroundColor: '#ff6b6b',
+    paddingVertical: 12,
     borderRadius: 10,
     alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.15,
     shadowRadius: 3,
-    elevation: 4,
+    elevation: 3,
   },
-  
   btnText: {
-    color: 'white',
+    color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
   },
-  
-
-
 });
-
