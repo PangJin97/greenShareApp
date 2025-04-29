@@ -12,7 +12,11 @@ import { store } from "@/redux/store";
 import * as SecureStore from "expo-secure-store";
 import { loginReducer, logoutReducer } from "@/redux/authSlice";
 import { jwtDecode } from "jwt-decode";
+
 import WebSocketClient from "./(tabs)/follow/WebSocketClient";
+
+import Toast from 'react-native-toast-message';
+
 
 // 스플래시 화면이 에셋 로딩이 완료될 때까지 유지되도록 설정
 SplashScreen.preventAutoHideAsync();
@@ -106,6 +110,7 @@ export default function RootLayout() {
           <Stack screenOptions={{ headerShown: false }} />
 
           <StatusBar style="auto" translucent={false} />
+          <Toast />
         </SafeAreaView>
       </AuthManager>
     </Provider>
