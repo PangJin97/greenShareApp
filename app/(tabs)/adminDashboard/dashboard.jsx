@@ -93,6 +93,9 @@ const Dashboard = ({
         {customTitle} ({latest.joinDate})
       </Text>
 
+        {/* ✅ 기기 제어 컴포넌트 */}
+        <DeviceControl cropId={id} />
+
       {/* 뒤로가기 버튼 */}
       <Text style={styles.backButton} onPress={() => router.back()}>
         ← 뒤로가기
@@ -104,8 +107,7 @@ const Dashboard = ({
       {renderCard("💧 습도", latest.humidity, "%", isHumidOk)}
       {renderCard("🌱 토양 수분", latest.soilMoisture, "%", isSoilOk)}
 
-      {/* ✅ 기기 제어 컴포넌트 */}
-      <DeviceControl cropId={id} />
+    
     </ScrollView>
   );
 };
