@@ -17,8 +17,7 @@ const Login = () => {
   const [loginData, setLoginData] = useState({
     userEmail: "",
     userPassword: "",
-    userName : "",
-    userRole : ""
+    
 
   });
 
