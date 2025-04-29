@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import axios from 'axios';
+import Toast from 'react-native-toast-message'; // ✅ Toast 추가
 
 // Flask 서버 주소
 const RPI_BASE_URL = 'http://192.168.30.235:5000';
@@ -32,9 +33,19 @@ export default function DeviceControl({ cropId }) {
         { state, cropId },
         { headers: { 'Content-Type': 'application/json' } }
       );
-      alert(`LED ${state === 'on' ? '켜짐' : '꺼짐'}`);
+      Toast.show({
+        type: 'success',
+        text1: `LED ${state === 'on' ? '켜짐' : '꺼짐'}`,
+        position : 'top'
+      });
     } catch (err) {
       console.log('LED 제어 실패', err.message);
+      Toast.show({
+        type: 'error',
+        text1: 'LED 제어 실패',
+        text2: err.message,
+        position : 'top',
+      });
     }
   };
 
@@ -47,6 +58,9 @@ export default function DeviceControl({ cropId }) {
         <Button title="LED 켜기" onPress={() => controlLED('on')} />
         <Button title="LED 끄기" onPress={() => controlLED('off')} />
       </View>
+
+      {/* Toast 컴포넌트 등록 */}
+      <Toast />
     </View>
   );
 }
