@@ -24,9 +24,11 @@ import { Octicons } from "@expo/vector-icons";
 
 // 화면 너비 가져오기
 const screenWidth = Dimensions.get("window").width;
-const router = useRouter(); // ✅ 함수 안에서 호출
+
 
 const ProfileHomeScreen = () => {
+
+  const router = useRouter(); 
   const [boardList, setBoardList] = useState([]); // 게시물 목록 상태
   const [loading, setLoading] = useState(false); // 로딩 상태
   const [userEmail, setUserEmail] = useState(null); // 사용자 이메일 상태
@@ -81,14 +83,26 @@ const ProfileHomeScreen = () => {
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />
       ) : (
+        
         <FlatList
           data={boardList}
           renderItem={({ item }) => (
+          <Pressable
+            onPress={() => {
+              router.push({
+                pathname: '/community/detail',
+                params: { boardNum: item.boardNum }, // boardNum 같이 넘기기
+              });
+            }}
+          >
             <CommunityItem item={item} />
-          )}
-          keyExtractor={(item) => item.boardNum.toString()}
-          contentContainerStyle={{ paddingBottom: 100 }} // 리스트 아래 여유 주기
-        />
+          </Pressable>
+        )}
+        keyExtractor={(item) => item.boardNum.toString()}
+        contentContainerStyle={{ paddingBottom: 100 }}
+      />
+      
+        
       )}
   
         <Pressable style={styles.writeBtn} onPress={() => { 
