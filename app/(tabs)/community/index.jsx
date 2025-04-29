@@ -7,6 +7,7 @@ import {
   FlatList,
   Dimensions,
   Alert,
+  Pressable,
 } from "react-native";
 import { getStories, removeLike } from "../../../apis/plantStory";
 import {
@@ -16,11 +17,14 @@ import {
 import * as SecureStore from "expo-secure-store";
 import Toast from 'react-native-toast-message';  // Toast import
 import CommunityItem from "../../../components/CommunityItem";
+import { useRouter } from "expo-router";
+import { Octicons } from "@expo/vector-icons";
 
 
 
 // 화면 너비 가져오기
 const screenWidth = Dimensions.get("window").width;
+const router = useRouter(); // ✅ 함수 안에서 호출
 
 const ProfileHomeScreen = () => {
   const [boardList, setBoardList] = useState([]); // 게시물 목록 상태
@@ -73,22 +77,34 @@ const ProfileHomeScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>커뮤니티</Text>
-
+  
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />
       ) : (
         <FlatList
           data={boardList}
           renderItem={({ item }) => (
-            <CommunityItem item={item}/>
+            <CommunityItem item={item} />
           )}
           keyExtractor={(item) => item.boardNum.toString()}
+          contentContainerStyle={{ paddingBottom: 100 }} // 리스트 아래 여유 주기
         />
       )}
+  
+        <Pressable style={styles.writeBtn} onPress={() => { 
+          router.push('/community/reg-commu');
+        }}>
+          <Octicons name="pencil" size={28} color="white" />
+        </Pressable>
+  
       {/* <Toast ref={(ref) => Toast.setRef(ref)} /> */}
     </View>
   );
+  
+  
 };
+
+
 
 // 스타일 정의
 const styles = StyleSheet.create({
@@ -101,6 +117,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 16,
+    
   },
   loader: {
     marginTop: 20,
@@ -146,6 +163,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#444",
   },
+  writeBtn: {
+    position: 'absolute',
+    bottom: 30,
+    right: 20,
+    backgroundColor: '#007bff',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 8, // Android 그림자
+    shadowColor: '#000', // iOS 그림자
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+  },
+  
+  
 });
 
 export default ProfileHomeScreen;

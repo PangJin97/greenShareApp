@@ -25,9 +25,7 @@ const HomeScreen = () => {
         }}
         contentContainerStyle={styles.listCon}
       />
-      <Pressable style={styles.writeBtn} onPress={()=>{router.push('/community/reg-commu')}}>
-        <Octicons name="pencil" size={24} color="white" />
-      </Pressable>
+      
     </View>
   );
 };

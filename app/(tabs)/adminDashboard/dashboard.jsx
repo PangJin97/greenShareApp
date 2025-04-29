@@ -10,7 +10,7 @@ import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import CustomText from "../../../components/common/CustomText";
 import { colors } from "../../../constants/colorConstant";
-import { router } from "expo-router";
+import { router, useRouter } from "expo-router";
 import envDetail from "./[envId]";
 import EnvDetail from "./[envId]";
 
@@ -23,6 +23,8 @@ const Dashboard = ({
   id /* 프롭스로 작물의 아이디를 받아온다 */,
 }) => {
   const nav = useNavigation(); /* 컴포넌트 이동을 위한 네비게이션 */
+  const router =  useRouter();
+
   const [latest, setLatest] = useState({
     /* 환경변수를 담아올 변수 */ temperature: 0,
     illuminance: 0,
