@@ -11,8 +11,9 @@ import { getUserRoleFromToken } from "../../redux/authHelper";
 const TabLayout = () => {
   const token = useSelector((state) => state.auth.token);
   const router = useRouter();
-  const role = getUserRoleFromToken(token)
-  
+  const role = getUserRoleFromToken(token);
+  const auth = useSelector((state) => state.auth); 
+
 
   const options = {
     title: "대쉬보드, 작물리스트",
@@ -20,13 +21,12 @@ const TabLayout = () => {
       <MaterialIcons name="dashboard" size={24} color="black" />
     ),
   };
-  
+
   if (!role || role === "ROLE_FARMER") {
     options.href = null;
   }
 
- console.log(getUserRoleFromToken(token))
-
+  console.log(getUserRoleFromToken(token));
 
   // 로그인이 필요한 탭 목록
   const protectedTabs = ["adminDashboard", "deviceControl", "follow"]; // 로그인이 필요한 탭 이름들
@@ -56,22 +56,20 @@ const TabLayout = () => {
             }}
           />
 
-          
-            <Tabs.Screen
-              name="adminDashboard"
-              options={options}
-              listeners={{
-                tabPress: (e) => {
-                  if (!checkAuthForTab("adminDashboard")) {
-                    // 기본 탭 이벤트 방지
-                    e.preventDefault();
-                    // 로그인 페이지로 이동
-                    router.push("/auth/login");
-                  }
-                },
-              }}
-            />
-        
+          <Tabs.Screen
+            name="adminDashboard"
+            options={options}
+            listeners={{
+              tabPress: (e) => {
+                if (!checkAuthForTab("adminDashboard")) {
+                  // 기본 탭 이벤트 방지
+                  e.preventDefault();
+                  // 로그인 페이지로 이동
+                  router.push("/auth/login");
+                }
+              },
+            }}
+          />
 
           <Tabs.Screen
             name="community"
