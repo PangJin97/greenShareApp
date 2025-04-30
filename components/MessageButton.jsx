@@ -29,7 +29,7 @@ const MessageButton = ({ receiver }) => {
 
   const goToPrac = () => {
     // `push`를 사용하여 쿼리 파라미터와 함께 이동
-    navigation.navigate("follow/WebSocketClient", { sender, receiver });
+    navigation.navigate("WebSocketClient", { sender, receiver });
   };
 
   useEffect(() => {
