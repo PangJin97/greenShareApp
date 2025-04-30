@@ -7,7 +7,7 @@ export const getStories = async () => {
     return response;
   } 
 
-// 좋아요 기능
+// 좋아요 등록 기능
 export const insertLike = async (boardNum) => {
   const response = await axiosInstance.post("/plantStories/like-insert", {
     boardNum
@@ -15,11 +15,12 @@ export const insertLike = async (boardNum) => {
   return response;
 };
 
-// 좋아요 취소 기능
+// 좋아요 삭제 기능
 export const deleteLike = async (boardNum) => {
   const response = await axiosInstance.delete(
     `/plantStories/like-delete/${boardNum}`
   );
-  return response.data; 
+  return response 
 };
+
 
