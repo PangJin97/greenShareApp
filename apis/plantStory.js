@@ -15,7 +15,6 @@ export const getMyPost = (userEmail) => {
 }
 
 
-
 //좋아요 기능
 export const insertLike = async (boardNum) => {
   const response = await axiosInstance.post("/plantStories/like-insert", {
