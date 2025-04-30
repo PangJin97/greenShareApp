@@ -57,7 +57,7 @@ const SerchHomeScreen = () => {
     const fetchFollow = async () => {
       const userEmail = await getUserEmailFromToken();
       if (!userEmail) return;
-
+      console.log(userEmail);
       FollowLists(userEmail);
     };
 
