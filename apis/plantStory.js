@@ -1,5 +1,6 @@
 import { axiosInstance } from "./axiosInstance";
 import * as SecureStore from 'expo-secure-store';
+
 // 식물 커뮤니티 조회 API
 export const getStories = async () => {
   const response = await axiosInstance.get("/plantStories");
