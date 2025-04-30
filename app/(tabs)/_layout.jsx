@@ -6,6 +6,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
 import SimpleLineIcons from "@expo/vector-icons/SimpleLineIcons";
 import { useSelector } from "react-redux";
+import { getUserRoleFromToken } from "../../redux/authHelper";
 
 const TabLayout = () => {
   const auth = useSelector((state) => state.auth);
@@ -39,26 +40,27 @@ const TabLayout = () => {
             }}
           />
 
-          <Tabs.Screen
-            name="adminDashboard"
-            options={{
-              title: "대쉬보드, 작물리스트",
-              tabBarStyle:{display:'none'},
-              tabBarIcon: () => (
-                <MaterialIcons name="dashboard" size={24} color="black" />
-              ),
-            }}
-            listeners={{
-              tabPress: (e) => {
-                if (!checkAuthForTab("adminDashboard")) {
-                  // 기본 탭 이벤트 방지
-                  e.preventDefault();
-                  // 로그인 페이지로 이동
-                  router.push("/auth/login");
-                }
-              },
-            }}
-          />
+          {auth.role === "ROLE_ADMIN" && (
+            <Tabs.Screen
+              name="adminDashboard"
+              options={{
+                title: "대쉬보드, 작물리스트",
+                tabBarIcon: () => (
+                  <MaterialIcons name="dashboard" size={24} color="black" />
+                ),
+              }}
+              listeners={{
+                tabPress: (e) => {
+                  if (!checkAuthForTab("adminDashboard")) {
+                    // 기본 탭 이벤트 방지
+                    e.preventDefault();
+                    // 로그인 페이지로 이동
+                    router.push("/auth/login");
+                  }
+                },
+              }}
+            />
+          )}
 
           <Tabs.Screen
             name="community"
@@ -69,7 +71,7 @@ const TabLayout = () => {
               ),
             }}
           />
-  
+
           <Tabs.Screen
             name="follow"
             options={{

@@ -19,7 +19,7 @@ import { useFonts } from "expo-font";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import { colors } from "../../../constants/colorConstant";
 import CustomText from "./../../../components/common/CustomText";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 
 const ProfileHomeScreen = () => {
   const [list, setList] = useState([]);
