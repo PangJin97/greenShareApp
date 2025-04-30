@@ -41,11 +41,11 @@ const Header = () => {
         ) : (
           <>
             <Pressable onPress={() => router.push("/auth/login")}>
-              <Text>Login</Text>
+              <Text>로그인</Text>
             </Pressable>
 
             <Pressable onPress={() => router.push("/auth/join")}>
-              <Text>Join</Text>
+              <Text>회원가입</Text>
             </Pressable>
           </>
         )}
