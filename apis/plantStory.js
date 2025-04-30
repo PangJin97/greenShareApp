@@ -43,6 +43,8 @@ export const insertReply = async (replyData) => {
 
   return response.data;
 };
+
+
 // 게시글 당 댓들 조회
 export const replyList = async (boardNum) => {
   const response = await axiosInstance.get(`/plantReplies/${boardNum}`);
