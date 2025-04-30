@@ -4,6 +4,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getDetailStories, deleteStories, insertReply, replyList } from '../../../apis/plantStory';
 import RenderHtml from 'react-native-render-html';
 import * as SecureStore from 'expo-secure-store';
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 
 const DetailScreen = () => {
   const { boardNum } = useLocalSearchParams();
@@ -36,7 +38,8 @@ const DetailScreen = () => {
     },
   };
 // 상세 게시글 (boardNum)에 따른 목록 조회
-  useEffect(() => {
+useFocusEffect(
+  useCallback(() => {
     const fetchDetail = async () => {
       setLoading(true);
       try {
@@ -49,11 +52,12 @@ const DetailScreen = () => {
         setLoading(false);
       }
     };
+
     fetchDetail();
-  }, [boardNum],reloadTrigger);
+  }, [boardNum, reloadTrigger])
+);
 
 
-  setReplies
 
 //댓글 등록 함수
 const reply = async (replyData) => {
@@ -73,18 +77,20 @@ const reply = async (replyData) => {
 };
 
 //게시글 댓글 불러오는 함수
-useEffect(() => {
-  const fetchReplies = async () => {
-    try {
-      const res = await replyList(Number(boardNum));
-      setReplies(res.data);
-    } catch (err) {
-      console.error('댓글 불러오기 실패:', err);
-    }
-  };
+useFocusEffect(
+  useCallback(() => {
+    const fetchReplies = async () => {
+      try {
+        const res = await replyList(Number(boardNum));
+        setReplies(res.data);
+      } catch (err) {
+        console.error('댓글 불러오기 실패:', err);
+      }
+    };
 
-  if (boardNum) fetchReplies();
-}, [boardNum, reloadTrigger]); // boardNum 또는 reloadTrigger가 바뀌면 다시 조회
+    if (boardNum) fetchReplies();
+  }, [boardNum, reloadTrigger])
+); 
 
 
 
