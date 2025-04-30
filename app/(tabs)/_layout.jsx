@@ -9,8 +9,24 @@ import { useSelector } from "react-redux";
 import { getUserRoleFromToken } from "../../redux/authHelper";
 
 const TabLayout = () => {
-  const auth = useSelector((state) => state.auth);
+  const token = useSelector((state) => state.auth.token);
   const router = useRouter();
+  const role = getUserRoleFromToken(token)
+  
+
+  const options = {
+    title: "대쉬보드, 작물리스트",
+    tabBarIcon: () => (
+      <MaterialIcons name="dashboard" size={24} color="black" />
+    ),
+  };
+  
+  if (!role || role === "ROLE_FARMER") {
+    options.href = null;
+  }
+
+ console.log(getUserRoleFromToken(token))
+
 
   // 로그인이 필요한 탭 목록
   const protectedTabs = ["adminDashboard", "deviceControl", "follow"]; // 로그인이 필요한 탭 이름들
@@ -40,15 +56,10 @@ const TabLayout = () => {
             }}
           />
 
-          {auth.role === "ROLE_ADMIN" && (
+          
             <Tabs.Screen
               name="adminDashboard"
-              options={{
-                title: "대쉬보드, 작물리스트",
-                tabBarIcon: () => (
-                  <MaterialIcons name="dashboard" size={24} color="black" />
-                ),
-              }}
+              options={options}
               listeners={{
                 tabPress: (e) => {
                   if (!checkAuthForTab("adminDashboard")) {
@@ -60,7 +71,7 @@ const TabLayout = () => {
                 },
               }}
             />
-          )}
+        
 
           <Tabs.Screen
             name="community"
