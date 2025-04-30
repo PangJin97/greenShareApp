@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-end",
+    justifyContent: "flex-end", 
   },
   // 팔로우 상태일 때 버튼 스타일
   followingButton: {
