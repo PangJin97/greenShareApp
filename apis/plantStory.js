@@ -1,5 +1,5 @@
 import { axiosInstance } from "./axiosInstance";
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from "expo-secure-store";
 
 // 식물 커뮤니티 조회 API
 export const getStories = async () => {
@@ -11,9 +11,13 @@ export const getStories = async () => {
 export const getMyPost = (userEmail) => {
   const response = axiosInstance.get(`/plantStories/user/${userEmail}`);
   return response;
+};
 
-}
-
+//인기글 조회하기(좋아요 순)
+export const getPopularPosts = () => {
+  const response = axiosInstance.get("/plantStories/popular");
+  return response;
+};
 
 //좋아요 기능
 export const insertLike = async (boardNum) => {
@@ -70,7 +74,7 @@ export const upDateStories = async (boardNum, updateData) => {
     updateData,
     {
       headers: {
-        Authorization: `Bearer ${token}`, 
+        Authorization: `Bearer ${token}`,
       },
     }
   );
