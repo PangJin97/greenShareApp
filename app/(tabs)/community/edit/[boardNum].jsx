@@ -49,30 +49,36 @@ const EditScreen = () => {
     fetchData();
   }, [boardNum]);
 
-  const handleSave = async () => {
-    if (!title.trim() || !content.trim()) {
-      Alert.alert('입력 확인', '제목과 내용을 모두 입력해주세요.');
-      return;
-    }
 
-    try {
-      await upDateStories(Number(boardNum), { title, content });
-      Alert.alert('수정 완료', '게시글이 수정되었습니다.');
-      router.replace(`/community/detail?boardNum=${boardNum}`);
-    } catch (error) {
-      console.error('게시글 수정 실패:', error.response?.data || error.message);
-      Alert.alert('수정 실패', '게시글 수정 중 오류가 발생했습니다.');
-    }
-  };
 
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#007bff" />
-        <Text style={styles.loadingText}>불러오는 중...</Text>
-      </View>
-    );
-  }
+
+
+  
+
+      const handleSave = async () => {
+        if (!title.trim() || !content.trim()) {
+          Alert.alert('입력 확인', '제목과 내용을 모두 입력해주세요.');
+          return;
+        }
+
+        try {
+          await upDateStories(Number(boardNum), { title, content });
+          Alert.alert('수정 완료', '게시글이 수정되었습니다.');
+          router.replace(`/community/detail?boardNum=${boardNum}`);
+        } catch (error) {
+          console.error('게시글 수정 실패:', error.response?.data || error.message);
+          Alert.alert('수정 실패', '게시글 수정 중 오류가 발생했습니다.');
+        }
+      };
+
+      if (loading) {
+        return (
+          <View style={styles.center}>
+            <ActivityIndicator size="large" color="#007bff" />
+            <Text style={styles.loadingText}>불러오는 중...</Text>
+          </View>
+        );
+      }
 
   return (
     <ScrollView style={styles.container}>

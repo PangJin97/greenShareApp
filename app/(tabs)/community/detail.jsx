@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Pressable, Alert, Dimensions, ScrollView, Image } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { getDetailStories, deleteStories } from '../../../apis/plantStory';
+import { getDetailStories, deleteStories, insertReply } from '../../../apis/plantStory';
 import RenderHtml from 'react-native-render-html';
 
 const DetailScreen = () => {
@@ -46,6 +46,16 @@ const DetailScreen = () => {
     };
     fetchDetail();
   }, [boardNum]);
+
+const reply = ()=>{
+  insertReply()
+  .then(()=>{})
+  .catch(()=>{})
+}
+
+
+
+
 
   const handleDelete = async () => {
     Alert.alert(
@@ -106,15 +116,27 @@ const DetailScreen = () => {
 
         <View style={styles.contentArea}>
           {detailData.content ? (
+
             <RenderHtml
               contentWidth={screenWidth}
               source={{ html: detailData.content }}
               renderers={customRenderers}
             />
+            
           ) : (
-            <Text>내용 없음</Text>
+            <Text>내용 없음11</Text>
           )}
         </View>
+
+
+          <View>
+            <Text></Text>
+            <Text></Text>
+          </View>
+
+
+
+
 
         <View style={styles.buttonGroup}>
           <Pressable style={styles.editBtn} onPress={handleEdit}>
