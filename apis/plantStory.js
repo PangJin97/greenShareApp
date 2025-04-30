@@ -70,7 +70,7 @@ export const upDateStories = async (boardNum, updateData) => {
     updateData,
     {
       headers: {
-        Authorization: `Bearer ${token}`, // ✅ 필수!
+        Authorization: `Bearer ${token}`, 
       },
     }
   );
