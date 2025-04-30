@@ -27,6 +27,26 @@ export const deleteLike = async (boardNum) => {
 };
 
 
+// 댓글 등록 API
+export const insertReply = async (replyData) => {
+  const token = await SecureStore.getItemAsync('accessToken');
+
+  const response = await axiosInstance.post(
+    `/plantReplies`,      
+    replyData,             
+    {
+      headers: {
+        Authorization: `Bearer ${token}`, 
+      },
+    }
+  );
+
+  return response.data;
+};
+
+
+
+
 // 식물 커뮤니티 상세조회 API
 export const getDetailStories = async (boardNum) => {
   const response = await axiosInstance.get(`/plantStories/${boardNum}`);
