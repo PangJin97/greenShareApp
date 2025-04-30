@@ -7,6 +7,7 @@ import {
   FlatList,
   StyleSheet,
   Dimensions,
+  Pressable,
 } from "react-native";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
@@ -21,8 +22,9 @@ const WebSocketClient = () => {
   const [receiver, setReceiver] = useState(null);
   const [threadId, setThread] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [messageContent, setMessageContent] = useState("");
-  const [client, setClient] = useState(null);
+  const [messageContent, setMessageContent] =
+    useState(""); /* 메세지 내용부분 */
+  const [client, setClient] = useState(null); /* 소켓 클라이언트 설정 */
   const [connected, setConnected] = useState(false); // 연결 상태 추적
   const utcDate = new Date().toISOString(); /* 시간포멧을 설정하기 위한 */
   const date = new Date(utcDate);
@@ -48,10 +50,9 @@ const WebSocketClient = () => {
     second: "2-digit",
   });
 
+  /* 한국시간으로 표시해주는 함수*/
   const formatToKoreanTime = (isoTimestamp) => {
-    /* 한국시간으로 표시해주는 함수*/
     const date = new Date(isoTimestamp);
-
     return date.toLocaleTimeString("ko-KR", {
       hour: "2-digit" /* 시간 */,
       minute: "2-digit" /* 분 */,
@@ -221,12 +222,32 @@ const WebSocketClient = () => {
       {/* 입력창 */}
       <View style={loStyles.inputContainer}>
         <TextInput
-          style={loStyles.input}
-          placeholder="Enter message"
+          style={[loStyles.input, { fontFamily: "Pretendard-Medium" }]}
+          placeholder="메세지 입력"
           value={messageContent}
           onChangeText={setMessageContent}
         />
-        <Button title="전송" onPress={sendMessage} color="#27B06E" />
+        {messageContent ? (
+          <Pressable
+            style={[loStyles.sendBTN, loStyles.green]}
+            color="#27B06E"
+            onPress={sendMessage}
+          >
+            <CustomText weight="Bold" col="white" size={20}>
+              ↑
+            </CustomText>
+          </Pressable>
+        ) : (
+          <Pressable
+            style={[loStyles.sendBTN, loStyles.gray]}
+            color="#27B06E"
+            onPress={sendMessage}
+          >
+            <CustomText weight="Bold" size={20}>
+              ↑
+            </CustomText>
+          </Pressable>
+        )}
       </View>
     </View>
   );
@@ -238,32 +259,32 @@ const screenHeight = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
 const loStyles = StyleSheet.create({
   mainCon: {
-    flex: 1,
-    backgroundColor: "#fff",
+    /* 메인 컨테이너 */ flex: 1,
+    backgroundColor: "#fff" /* 백그라운드 컬러 */,
   },
   msgCon: {
-    flex: 1,
-    paddingHorizontal: 11,
+    /* 메세지 컨테이너 */ flex: 1,
+    paddingHorizontal: 11 /* 양옆 패딩을 주어 메세지가 띄어지게함 */,
   },
   inputContainer: {
-    flexDirection: "row",
+    /* 인풋 및 버튼을 담고 있는 컨테이너 */ flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 10,
-    borderTopWidth: 1,
-    borderColor: "#ccc",
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#ffffff",
+    position: "relative",
   },
   input: {
-    flex: 1,
-    height: 40,
-    borderWidth: 1,
+    /* 채팅 입력창 */ flex: 1,
+    height: 40 /* 채팅창 높이 */,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: "gray",
-    paddingHorizontal: 10,
-    marginRight: 10,
+    width: "100%",
+    borderRadius: 20,
+    paddingLeft: 20,
   },
   messageBubble: {
-    maxWidth: "80%",
+    /* 말풍선 디자인틀 */ maxWidth: "80%",
     borderRadius: 10,
     marginVertical: 5,
     flexDirection: "column", // 세로로 배치
@@ -272,36 +293,51 @@ const loStyles = StyleSheet.create({
     paddingVertical: 7,
   },
   myMessage: {
-    backgroundColor: "#27B06E",
+    /* 내가 보낸 말풍선 */ backgroundColor: "#27B06E",
     alignSelf: "flex-end",
   },
   otherMessage: {
-    backgroundColor: "#EAEAEA",
+    /* 상대방이 보낸 말풍선 */ backgroundColor: "#EAEAEA",
     alignSelf: "flex-start",
   },
   messageText: {
-    fontSize: 16,
+    /* 말풍선 폰트 */ fontSize: 16,
   },
   timestamp: {
-    fontSize: 11,
+    /* 메세지 시간 폰트 설정 */ fontSize: 11,
     color: "gray",
     marginTop: 0, // 메시지와 시간 간격 조정
     textAlign: "right", // 오른쪽 정렬 (필요시 조정)
     marginBottom: 10,
   },
   timestampRight: {
-    paddingRight: 5,
+    /* 내가 보낸 메세지일 경우 오른쪽에 배치 */ paddingRight: 5,
     alignSelf: "flex-end", // 보낸 메시지의 시간을 오른쪽 정렬
   },
 
   timestampLeft: {
-    paddingLeft: 5,
+    /* 상대가 보낸 메세지일 경우 왼쪽에 배치 */ paddingLeft: 5,
     alignSelf: "flex-start", // 받은 메시지의 시간을 왼쪽 정렬
   },
   white: {
-    color: "white",
+    /* 흰색 */ color: "white",
   },
   black: {
-    color: "#374151",
+    /* 검은색 */ color: "#374151",
+  },
+  sendBTN: {
+    /* 메세지 전송 버튼 디자인 공용틀 */ width: 30,
+    height: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 30,
+    position: "absolute",
+    right: 15,
+  },
+  green: {
+    backgroundColor: "#27B06E",
+  },
+  gray: {
+    backgroundColor: "#E2E8F0",
   },
 });
