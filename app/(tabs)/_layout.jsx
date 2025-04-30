@@ -43,6 +43,7 @@ const TabLayout = () => {
             name="adminDashboard"
             options={{
               title: "대쉬보드, 작물리스트",
+              tabBarStyle:{display:'none'},
               tabBarIcon: () => (
                 <MaterialIcons name="dashboard" size={24} color="black" />
               ),
