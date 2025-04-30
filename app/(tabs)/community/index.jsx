@@ -80,6 +80,25 @@ const ProfileHomeScreen = () => {
     }, [])
   );
 
+  const changeFollowStatus = (followId) => {
+    console.log(followId);
+    console.log(boardList[0].userEmail);
+    console.log(boardList[0].isFollow);
+    
+    const newBoardList = boardList.map(item => {
+      if (item.userEmail === followId) {
+        return {
+          ...item,
+          isFollow: item.isFollow === 'Y' ? 'N' : 'Y'
+        };
+      }
+      return item;
+    });
+
+    setBoardList([...newBoardList]);
+  }
+
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>커뮤니티</Text>
@@ -99,7 +118,7 @@ const ProfileHomeScreen = () => {
               });
             }}
           >
-            <CommunityItem item={item} />
+            <CommunityItem item={item} changeFollowStatus={changeFollowStatus}/>
           </Pressable>
         )}
         keyExtractor={(item) => item.boardNum.toString()}
