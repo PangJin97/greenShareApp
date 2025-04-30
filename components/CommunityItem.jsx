@@ -18,6 +18,7 @@ import CustomText from "./common/CustomText";
 import Octicons from "@expo/vector-icons/Octicons";
 import Profile from "./Profile";
 
+//사진 너비 조절
 const screenWidth = Dimensions.get("window").width;
 
 const CommunityItem = ({ item, changeFollowStatus}) => {
@@ -28,6 +29,8 @@ const CommunityItem = ({ item, changeFollowStatus}) => {
     fromUserEmail: "",
     toUserEmail: "",
   });
+
+  
 
   useEffect(() => {
     getUserEmailFromToken();
@@ -57,6 +60,7 @@ const CommunityItem = ({ item, changeFollowStatus}) => {
     setIsFollowed(item.isFollow === "Y");
   }, [item]);
 
+  //html에 있는 사진 html코드를 사진으로 변환 
   const extractImages = (htmlContent) => {
     const imgRegex = /<img[^>]+src="([^">]+)"/g;
     const images = [];
@@ -156,13 +160,19 @@ const CommunityItem = ({ item, changeFollowStatus}) => {
       <View style={styles.header}>
         <Text style={styles.email}>
           {item.userEmail}</Text>
-        <Pressable onPress={() => followInfo(item.boardNum)}>
-          <View style={styles.followButton}>
-            <Text style={styles.followText}>
-              {isFollowed ? "팔로잉" : "팔로우"}
-            </Text>
-          </View>
-        </Pressable>
+          {
+            item.userEmail === followList.fromUserEmail 
+            ? 
+            null
+            :
+            <Pressable onPress={() => followInfo(item.boardNum)}>
+              <View style={styles.followButton}>
+                <Text style={styles.followText}>
+                  {isFollowed ? "팔로잉" : "팔로우"}
+                </Text>
+              </View>
+          </Pressable>
+          }
       </View>
 
       {extractImages(item.content).map((imgUrl, index) => (
@@ -207,6 +217,9 @@ const CommunityItem = ({ item, changeFollowStatus}) => {
         <View style={styles.viewCountContainer}>
           <MaterialCommunityIcons name="eye-outline" size={24} color="black" />
           <CustomText style={styles.eyeText}>{item.readCnt}</CustomText>
+        </View>
+        <View>
+
         </View>
       </View>
     </View>
@@ -258,7 +271,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#444",
   },
+  
   iconContainer: {
+    marginTop:20,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -272,7 +287,9 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   viewCountContainer: {
+    justifyContent:'flex-end',
     flexDirection: "row",
+    flex:1,
     alignItems: "center",
     gap: 4,
     marginLeft: 10,
@@ -282,7 +299,9 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   message: {
+    flex:1,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent:'flex-end'
   },
 });
