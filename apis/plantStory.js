@@ -9,7 +9,12 @@ export const getStories = async () => {
     return response;
   } 
 
-// 좋아요 등록 기능
+//앱에서 내 글만 조회하기
+export const getMyPost = (userEmail) => {
+ const response = axiosInstance.get(`/plantStories/user/${userEmail}`);
+ return response;
+}
+
 export const insertLike = async (boardNum) => {
   const response = await axiosInstance.post("/plantStories/like-insert", {
     boardNum
