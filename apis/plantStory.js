@@ -11,7 +11,9 @@ export const getStories = async () => {
 export const getMyPost = (userEmail) => {
   const response = axiosInstance.get(`/plantStories/user/${userEmail}`);
   return response;
-};
+
+}
+
 
 //좋아요 기능
 export const insertLike = async (boardNum) => {
@@ -68,7 +70,7 @@ export const upDateStories = async (boardNum, updateData) => {
     updateData,
     {
       headers: {
-        Authorization: `Bearer ${token}`, // ✅ 필수!
+        Authorization: `Bearer ${token}`, 
       },
     }
   );
