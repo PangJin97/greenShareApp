@@ -15,6 +15,7 @@ import { useRoute } from "@react-navigation/native";
 import { axiosInstance } from "./../../../apis/axiosInstance";
 import { styles } from "./../../../node_modules/react-native-toast-message/lib/src/components/AnimatedContainer.styles";
 import CustomText from "./../../../components/common/CustomText";
+import Feather from "@expo/vector-icons/Feather";
 
 const WebSocketClient = () => {
   const route = useRoute();
