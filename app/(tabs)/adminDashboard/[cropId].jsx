@@ -4,8 +4,6 @@ import { useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import Dashboard from "./dashboard";
 import CustomText from "../../../components/common/CustomText";
-import MessageScreen from "../../../components/Message";
-import WebSocketClient from "../../../components/Message";
 
 const CropDetail = () => {
   const { cropId } = useLocalSearchParams();
@@ -26,8 +24,7 @@ const CropDetail = () => {
   return (
     <ScrollView style={styles.mainCon}>
       <CustomText>{crop.crop} </CustomText>
-      {/* <Dashboard id={cropId} cropDetail={crop} /> */}
-      <WebSocketClient />
+      <Dashboard id={cropId} cropDetail={crop} />
     </ScrollView>
   );
 };
@@ -35,7 +32,7 @@ const CropDetail = () => {
 export default CropDetail;
 
 const styles = StyleSheet.create({
-  mainCon: {  
+  mainCon: {
     flex: 1,
     backgroundColor: "white",
   },

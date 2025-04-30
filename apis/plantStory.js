@@ -1,8 +1,10 @@
 import { axiosInstance } from "./axiosInstance";
 
+
+
 // 식물 커뮤니티 조회 API
 export const getStories = async () => {
- 
+
     const response = await axiosInstance.get("/plantStories");
     return response;
   } 
@@ -22,5 +24,6 @@ export const deleteLike = async (boardNum) => {
   );
   return response 
 };
+
 
 
