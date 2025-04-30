@@ -1,28 +1,20 @@
 import {
+  FlatList,
+  ScrollView,
   StyleSheet,
   Text,
-  View,
-  ScrollView,
   TouchableOpacity,
-  Dimensions,
-  Image,
-  FlatList,
+  View,
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { follow, unfollowApi } from "../../../apis/memberApi";
 import * as SecureStore from "expo-secure-store";
-import { decode as atob } from "base-64";
 import MessageButton from "../../../components/MessageButton";
-import { getMyPost } from "../../../apis/plantStory";
-import { useFocusEffect } from "expo-router";
-import RenderHtml from "react-native-render-html";
 import CustomText from "../../../components/common/CustomText";
-import FollowList from "./followList";
+import { useFocusEffect } from "expo-router";
 
-const screenWidth = Dimensions.get("window").width;
-
-const SerchHomeScreen = () => {
-  const [post, setMyPost] = useState([]);
+const FollowList = () => {
+  const [followList, setFollowList] = useState([]);
 
   const getUserEmailFromToken = async () => {
     try {
@@ -30,6 +22,7 @@ const SerchHomeScreen = () => {
       if (!token) return null;
       const payload = token.split(".")[1];
       const decoded = JSON.parse(atob(payload));
+      console.log(decoded.sub);
       return decoded.sub;
     } catch (error) {
       console.error("토큰 디코딩 오류:", error);
@@ -37,73 +30,69 @@ const SerchHomeScreen = () => {
     }
   };
 
-  const customRenderers = {
-    img: ({ tnode }) => {
-      const imageUri = tnode.attributes.src;
-      if (!imageUri) return null;
-      return (
-        <Image
-          source={{ uri: imageUri }}
-          style={{
-            width: screenWidth * 0.9,
-            height: 200,
-            resizeMode: "contain",
-            borderRadius: 10,
-            alignSelf: "center",
-            marginVertical: 10,
-          }}
-        />
-      );
-    },
+  const followLists = (userEmail) => {
+    follow(userEmail)
+      .then((res) => {
+        setFollowList(res.data);
+      })
+      .catch((error) => {
+        console.log("팔로우 API 오류:", error);
+      });
   };
 
   useFocusEffect(
     useCallback(() => {
-      getUserEmailFromToken().then((userEmail) => {
+      const fetchFollow = async () => {
+        const userEmail = await getUserEmailFromToken();
         if (!userEmail) return;
-        getMyPost(userEmail)
-          .then((res) => {
-            setMyPost(res.data);
-          })
-          .catch((err) => {
-            console.log("내 글 가져오기 오류:", err);
-          });
-      });
+        followLists(userEmail);
+      };
+
+      fetchFollow();
     }, [])
   );
 
+  const unfollow = async (toUserEmail) => {
+    const fromUserEmail = await getUserEmailFromToken();
+    if (!fromUserEmail) return;
+
+    try {
+      await unfollowApi(toUserEmail, fromUserEmail);
+      setFollowList((prevList) =>
+        prevList.filter((user) => user.toUserEmail !== toUserEmail)
+      );
+    } catch (err) {
+      console.log("언팔로우 오류:", err);
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
-      {/* 컴포넌트로 만든 팔로우 리스트 */}
-      <FollowList />
-      <Text style={styles.title}>내가 작성한 글</Text>
-
       <FlatList
-        data={post}
-        keyExtractor={(item) => item.boardNum.toString()}
+        data={followList}
+        keyExtractor={(item) => item.toUserEmail}
         renderItem={({ item }) => (
           <View style={styles.card}>
-            <Text style={styles.label}>제목</Text>
-            <Text style={styles.email}>{item.title}</Text>
+            <View style={styles.row}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.label}>📧 이메일</Text>
+                <Text style={styles.email}>{item.toUserEmail}</Text>
+              </View>
 
-            <Text style={styles.label}>내용</Text>
-            <RenderHtml
-              contentWidth={screenWidth * 0.9}
-              source={{ html: item.content }}
-              renderers={customRenderers}
-              tagsStyles={{
-                p: {
-                  fontSize: 14,
-                  color: "#2d3436",
-                  lineHeight: 20,
-                  marginBottom: 8,
-                },
-              }}
-            />
+              <MessageButton receiver={item.toUserEmail} />
+              <TouchableOpacity
+                style={styles.unfollowBtn}
+                onPress={() => unfollow(item.toUserEmail)}
+              >
+                <CustomText style={styles.unfollowText} weight="Bold">
+                  언팔로우
+                </CustomText>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
         ListEmptyComponent={
-          <Text style={styles.empty}>작성한 글이 없습니다.</Text>
+          <Text style={styles.empty}>팔로우한 사용자가 없습니다.</Text>
         }
         scrollEnabled={false}
       />
@@ -111,7 +100,7 @@ const SerchHomeScreen = () => {
   );
 };
 
-export default SerchHomeScreen;
+export default FollowList;
 
 const styles = StyleSheet.create({
   container: {
