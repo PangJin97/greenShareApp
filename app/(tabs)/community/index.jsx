@@ -21,6 +21,7 @@ import { useRouter } from "expo-router";
 import { Octicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
+import { LinearGradient } from 'expo-linear-gradient';
 
 
 
@@ -38,6 +39,7 @@ const ProfileHomeScreen = () => {
   //const [likeLoading, setLikeLoading] = useState({}); // 각 게시물의 좋아요 요청 상태 관리
 
 
+  // 사용자 정보 가져옴
   useFocusEffect(
     useCallback(() => {
       const fetchUserInfo = async () => {
@@ -80,10 +82,8 @@ const ProfileHomeScreen = () => {
     }, [])
   );
 
+  // 팔로우 바뀌면 화면에 반영
   const changeFollowStatus = (followId) => {
-    console.log(followId);
-    console.log(boardList[0].userEmail);
-    console.log(boardList[0].isFollow);
     
     const newBoardList = boardList.map(item => {
       if (item.userEmail === followId) {
@@ -100,45 +100,45 @@ const ProfileHomeScreen = () => {
 
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>커뮤니티</Text>
-  
-      {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />
-      ) : (
-        
-        <FlatList
-          data={boardList}
-          renderItem={({ item }) => (
+
+  <LinearGradient
+   colors={['#D1FAE5', '#A7F3D0']} // ✅ 연한 민트-연두
+    start={{ x: 0, y: 0 }}
+    end={{ x: 1, y: 1 }}
+    style={styles.container}
+  >
+    <Text style={styles.header}>Plant Story</Text>
+
+    {loading ? (
+      <ActivityIndicator size="large" color="#ffffff" style={styles.loader} />
+    ) : (
+      <FlatList
+        data={boardList}
+        renderItem={({ item }) => (
           <Pressable
             onPress={() => {
               router.push({
                 pathname: '/community/detail',
-                params: { boardNum: item.boardNum }, // boardNum 같이 넘기기
+                params: { boardNum: item.boardNum },
               });
             }}
           >
-            <CommunityItem item={item} changeFollowStatus={changeFollowStatus}/>
+            <CommunityItem item={item} changeFollowStatus={changeFollowStatus} />
           </Pressable>
         )}
         keyExtractor={(item) => item.boardNum.toString()}
         contentContainerStyle={{ paddingBottom: 100 }}
       />
-      
-        
-      )}
-  
-        <Pressable style={styles.writeBtn} onPress={() => { 
-          router.push('/community/reg-commu');
-        }}>
-          <Octicons name="pencil" size={28} color="white" />
-        </Pressable>
-  
-      {/* <Toast ref={(ref) => Toast.setRef(ref)} /> */}
-    </View>
+
+    )}
+
+    <Pressable style={styles.writeBtn} onPress={() => router.push('/community/reg-commu')}>
+      <Octicons name="pencil" size={28} color="white" />
+    </Pressable>
+  </LinearGradient>
+
+
   );
-  
-  
 };
 
 

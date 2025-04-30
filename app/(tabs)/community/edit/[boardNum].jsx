@@ -8,6 +8,7 @@ import {
   Alert,
   ScrollView,
   ActivityIndicator,
+  Pressable,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getDetailStories, upDateStories } from '../../../../apis/plantStory';
@@ -23,6 +24,8 @@ const EditScreen = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+
 
   useFocusEffect(
     useCallback(() => {
@@ -59,21 +62,21 @@ const EditScreen = () => {
 
   
 
-      const handleSave = async () => {
-        if (!title.trim() || !content.trim()) {
-          Alert.alert('입력 확인', '제목과 내용을 모두 입력해주세요.');
-          return;
-        }
-
-        try {
-          await upDateStories(Number(boardNum), { title, content });
-          Alert.alert('수정 완료', '게시글이 수정되었습니다.');
-          router.replace(`/community/detail?boardNum=${boardNum}`);
-        } catch (error) {
-          console.error('게시글 수정 실패:', error.response?.data || error.message);
-          Alert.alert('수정 실패', '게시글 수정 중 오류가 발생했습니다.');
-        }
-      };
+  const handleSave = async () => {
+    if (!title.trim() || !content.trim()) {
+      Alert.alert('입력 확인', '제목과 내용을 모두 입력해주세요.');
+      return;
+    }
+  
+    try {
+      await upDateStories(Number(boardNum), { title, content });
+      setShowModal(true); // ✅ 모달 표시
+    } catch (error) {
+      console.error('게시글 수정 실패:', error.response?.data || error.message);
+      Alert.alert('수정 실패', '게시글 수정 중 오류가 발생했습니다.');
+    }
+  };
+  
 
       if (loading) {
         return (
@@ -85,6 +88,7 @@ const EditScreen = () => {
       }
 
   return (
+  <>  
     <ScrollView style={styles.container}>
       <Text style={styles.header}>게시글 수정</Text>
 
@@ -122,6 +126,29 @@ const EditScreen = () => {
 
       <Button title="저장하기" onPress={handleSave} />
     </ScrollView>
+
+
+      {showModal && (
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalBox}>
+            <View style={styles.modalIcon}>
+              <Text style={{ fontSize: 32, color: "#10B981" }}>✔</Text>
+            </View>
+            <Text style={styles.modalTitle}>수정 완료!</Text>
+            <Text style={styles.modalDesc}>게시글이 성공적으로 수정되었습니다.</Text>
+            <Pressable
+              style={styles.modalButton}
+              onPress={() => {
+                setShowModal(false);
+                router.replace(`/community/detail?boardNum=${boardNum}`);
+              }}
+            >
+              <Text style={{ color: "#fff", fontWeight: "bold" }}>확인</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
+    </>   
   );
 };
 
@@ -182,4 +209,55 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 20,
   },
+  modalBackdrop: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  },
+  modalBox: {
+    width: "80%",
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 24,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: "#D1FAE5",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#10B981",
+    marginBottom: 8,
+  },
+  modalDesc: {
+    fontSize: 14,
+    color: "#555",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  modalButton: {
+    width: "100%",
+    backgroundColor: "#10B981",
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  
 });

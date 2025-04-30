@@ -7,16 +7,20 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Alert,
+  Modal,
+  Pressable,
 } from "react-native";
 import { api_join } from "../../apis/memberApi";
 import { useNavigation } from '@react-navigation/native';
-
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 
 
 const Join = () => {
 
-  const navigation = useNavigation();
+  
+  const [modalVisible, setModalVisible] = useState(false);
+
 
   const [joinData, setJoinData] = useState({
     userEmail: "",
@@ -73,15 +77,15 @@ const Join = () => {
     };
 
     api_join(dataToSend)
-      .then((res) => {
-        console.log("회원가입 성공:", res.data);
-        Alert.alert( "회원가입이 완료되었습니다!");
-        onPress: () => navigation.navigate('/')
-      })
-      .catch((e) => {
-        console.error("회원가입 실패:", e);
-        Alert.alert( "회원가입 오류 발생");
-      });
+    .then((res) => {
+      console.log("회원가입 성공:", res.data);
+      setModalVisible(true); // ✅ 모달 표시
+    })
+    .catch((e) => {
+      console.error("회원가입 실패:", e);
+      Alert.alert("회원가입 오류 발생");
+    });
+  
   };
 
   const handleGenderSelect = (selectedGender) => {
@@ -177,6 +181,88 @@ const Join = () => {
             value={joinData.tel3}
             onChangeText={(text) => handleChange(text, "tel3")}
           />
+
+
+<Modal visible={modalVisible} transparent animationType="fade">
+  <View
+    style={{
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <View
+      style={{
+        width: "80%",
+        backgroundColor: "#fff",
+        borderRadius: 16,
+        padding: 24,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+      }}
+    >
+      
+          <View
+            style={{
+              width: 72,
+              height: 72,
+              borderRadius: 36,
+              backgroundColor: "#D1FAE5", // 연한 초록 배경
+              justifyContent: "center",
+              alignItems: "center",
+              marginBottom: 16,
+            }}
+          >
+      <AntDesign name="checkcircleo" size={40} color="#10B981" />
+    </View>
+
+      
+
+
+      <Text
+        style={{
+          fontSize: 20,
+          fontWeight: "bold",
+          color: "#10B981",
+          marginBottom: 8,
+        }}
+      >
+        등록 완료!
+      </Text>
+      <Text
+        style={{
+          fontSize: 14,
+          color: "#555",
+          textAlign: "center",
+          marginBottom: 20,
+        }}
+      >
+        회원가입이 성공적으로 완료되었습니다.
+      </Text>
+
+      <Pressable
+        style={{
+          width: "100%",
+          backgroundColor: "#10B981",
+          paddingVertical: 10,
+          borderRadius: 8,
+          alignItems: "center",
+        }}
+        onPress={() => {
+          setModalVisible(false);
+          navigation.navigate("/"); // ✅ 홈으로 이동
+        }}
+      >
+        <Text style={{ fontWeight: "bold", color: "white" }}>확인</Text>
+      </Pressable>
+    </View>
+  </View>
+</Modal>
+
         </View>
 
         <TouchableOpacity style={styles.button} onPress={handleJoin}>
