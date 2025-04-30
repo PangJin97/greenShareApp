@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -15,11 +15,12 @@ import {
   getUserSubFromToken,
 } from "../../../redux/authHelper";
 import * as SecureStore from "expo-secure-store";
-import Toast from 'react-native-toast-message'; 
+import Toast from 'react-native-toast-message';  // Toast import
 import CommunityItem from "../../../components/CommunityItem";
-import { useFocusEffect } from "expo-router";
 import { useRouter } from "expo-router";
 import { Octicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 
 
 
@@ -37,51 +38,65 @@ const ProfileHomeScreen = () => {
   //const [likeLoading, setLikeLoading] = useState({}); // 각 게시물의 좋아요 요청 상태 관리
 
 
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        // SecureStore에서 토큰 가져오기
-        const token = await SecureStore.getItemAsync("accessToken");
-
-        if (token) {
-          // 토큰에서 이메일과 역할 정보 추출
-          const email = getUserSubFromToken(token); // 이메일
-          const role = getUserRoleFromToken(token); // 역할
-
-          setUserEmail(email); // 상태 업데이트
-          setUserRole(role); // 상태 업데이트
-        }
-      } catch (error) {
-        console.error("사용자 정보 로드 실패:", error);
-        Alert.alert("오류", "사용자 정보를 가져오는 데 실패했습니다.");
-      }
-    };
-
-    fetchUserInfo(); // 실행
-  }, []); // 빈 배열로, 컴포넌트가 마운트될 때 한 번만 실행
-
-
   useFocusEffect(
     useCallback(() => {
-      // 화면이 포커스될 때 실행할 코드
+      const fetchUserInfo = async () => {
+        try {
+          const token = await SecureStore.getItemAsync("accessToken");
+  
+          if (token) {
+            const email = getUserSubFromToken(token);
+            const role = getUserRoleFromToken(token);
+  
+            setUserEmail(email);
+            setUserRole(role);
+          }
+        } catch (error) {
+          console.error("사용자 정보 로드 실패:", error);
+          Alert.alert("오류", "사용자 정보를 가져오는 데 실패했습니다.");
+        }
+      };
+  
+      fetchUserInfo();
+    }, [])
+  ); // 빈 배열로, 컴포넌트가 마운트될 때 한 번만 실행
+
+  // 게시물 목록 가져오기
+  useFocusEffect(
+    useCallback(() => {
       const fetchStories = async () => {
         setLoading(true);
         try {
-          const response = await getStories(); // API 호출
-          setBoardList(response.data); // 상태 업데이트 (isLike가 각 항목에 포함되어 있어야 함)
+          const response = await getStories();
+          setBoardList(response.data);
         } catch (error) {
-          alert("오류");
+          alert("오류", "게시물 목록을 가져오는 데 실패했습니다.");
         } finally {
-          setLoading(false); 
+          setLoading(false);
         }
       };
   
       fetchStories();
-      return () => {
-        // 화면이 포커스를 잃을 때 실행할 코드
-      };
     }, [])
   );
+
+  const changeFollowStatus = (followId) => {
+    console.log(followId);
+    console.log(boardList[0].userEmail);
+    console.log(boardList[0].isFollow);
+    
+    const newBoardList = boardList.map(item => {
+      if (item.userEmail === followId) {
+        return {
+          ...item,
+          isFollow: item.isFollow === 'Y' ? 'N' : 'Y'
+        };
+      }
+      return item;
+    });
+
+    setBoardList([...newBoardList]);
+  }
 
 
   return (
@@ -103,7 +118,7 @@ const ProfileHomeScreen = () => {
               });
             }}
           >
-            <CommunityItem item={item} />
+            <CommunityItem item={item} changeFollowStatus={changeFollowStatus}/>
           </Pressable>
         )}
         keyExtractor={(item) => item.boardNum.toString()}

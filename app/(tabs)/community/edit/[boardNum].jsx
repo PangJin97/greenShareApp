@@ -12,6 +12,8 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getDetailStories, upDateStories } from '../../../../apis/plantStory';
 import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor'; // ✨ 추가
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 
 const EditScreen = () => {
   const { boardNum } = useLocalSearchParams();
@@ -22,32 +24,34 @@ const EditScreen = () => {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        if (!boardNum || isNaN(Number(boardNum))) {
-          throw new Error('유효하지 않은 boardNum입니다.');
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+        setLoading(true);
+        try {
+          if (!boardNum || isNaN(Number(boardNum))) {
+            throw new Error('유효하지 않은 boardNum입니다.');
+          }
+  
+          const res = await getDetailStories(Number(boardNum));
+  
+          if (!res?.data) {
+            throw new Error('게시글 데이터를 받지 못했습니다.');
+          }
+  
+          setTitle(res.data.title || '');
+          setContent(res.data.content || '');
+        } catch (error) {
+          console.error('게시글 불러오기 실패:', error);
+          Alert.alert('오류', '게시글을 불러오지 못했습니다.');
+        } finally {
+          setLoading(false);
         }
-
-        const res = await getDetailStories(Number(boardNum));
-
-        if (!res?.data) {
-          throw new Error('게시글 데이터를 받지 못했습니다.');
-        }
-
-        setTitle(res.data.title || '');
-        setContent(res.data.content || ''); // ✨ content 원본 유지 (HTML 삭제 안 함)
-      } catch (error) {
-        console.error('게시글 불러오기 실패:', error);
-        Alert.alert('오류', '게시글을 불러오지 못했습니다.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [boardNum]);
+      };
+  
+      fetchData();
+    }, [boardNum])
+  );
 
 
 

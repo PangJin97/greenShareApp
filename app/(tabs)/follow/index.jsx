@@ -4,15 +4,24 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
+  Dimensions,
+  Image,
+  FlatList,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { follow, unfollowApi } from "../../../apis/memberApi";
 import * as SecureStore from "expo-secure-store";
-import { decode as atob } from "base-64"; // atob 대체
+import { decode as atob } from "base-64";
 import MessageButton from "../../../components/MessageButton";
+import { getMyPost } from "../../../apis/plantStory";
+import { useFocusEffect } from "expo-router";
+import RenderHtml from "react-native-render-html";
+
+const screenWidth = Dimensions.get("window").width;
 
 const SerchHomeScreen = () => {
   const [followList, setFollowList] = useState([]);
+  const [post, setMyPost] = useState([]);
 
   const getUserEmailFromToken = async () => {
     try {
@@ -30,7 +39,6 @@ const SerchHomeScreen = () => {
   const FollowLists = (userEmail) => {
     follow(userEmail)
       .then((res) => {
-        console.log(res.data);
         setFollowList(res.data);
       })
       .catch((error) => {
@@ -44,7 +52,6 @@ const SerchHomeScreen = () => {
 
     try {
       await unfollowApi(toUserEmail, fromUserEmail);
-
       setFollowList((prevList) =>
         prevList.filter((user) => user.toUserEmail !== toUserEmail)
       );
@@ -53,43 +60,116 @@ const SerchHomeScreen = () => {
     }
   };
 
+  const customRenderers = {
+    img: ({ tnode }) => {
+      const imageUri = tnode.attributes.src;
+      if (!imageUri) return null;
+      return (
+        <Image
+          source={{ uri: imageUri }}
+          style={{
+            width: screenWidth * 0.9,
+            height: 200,
+            resizeMode: "contain",
+            borderRadius: 10,
+            alignSelf: "center",
+            marginVertical: 10,
+          }}
+        />
+      );
+    },
+  };
+
   useEffect(() => {
     const fetchFollow = async () => {
       const userEmail = await getUserEmailFromToken();
       if (!userEmail) return;
+
       console.log(userEmail);
+
       FollowLists(userEmail);
     };
 
     fetchFollow();
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      getUserEmailFromToken().then((userEmail) => {
+        if (!userEmail) return;
+        getMyPost(userEmail)
+          .then((res) => {
+            setMyPost(res.data);
+          })
+          .catch((err) => {
+            console.log("내 글 가져오기 오류:", err);
+          });
+      });
+    }, [])
+  );
+
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}> 팔로우 목록</Text>
+      <Text style={styles.title}>팔로우 목록</Text>
 
-      {followList.length === 0 ? (
-        <Text style={styles.empty}>팔로우한 사용자가 없습니다.</Text>
-      ) : (
-        followList.map((user) => (
-          <View key={user.toUserEmail} style={styles.card}>
+      <FlatList
+        data={followList}
+        keyExtractor={(item) => item.toUserEmail}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
             <View style={styles.row}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.label}>📧 이메일</Text>
-                <Text style={styles.email}>{user.toUserEmail}</Text>
+                <Text style={styles.email}>{item.toUserEmail}</Text>
               </View>
 
-              <MessageButton receiver={user.toUserEmail} />
+              <MessageButton receiver={item.toUserEmail} />
               <TouchableOpacity
                 style={styles.unfollowBtn}
-                onPress={() => unfollow(user.toUserEmail)}
+                onPress={() => unfollow(item.toUserEmail)}
               >
                 <Text style={styles.unfollowText}>언팔로우</Text>
               </TouchableOpacity>
             </View>
           </View>
-        ))
-      )}
+        )}
+        ListEmptyComponent={
+          <Text style={styles.empty}>팔로우한 사용자가 없습니다.</Text>
+        }
+        scrollEnabled={false}
+      />
+
+      <Text style={styles.title}>내가 작성한 글</Text>
+
+      <FlatList
+        data={post}
+        keyExtractor={(item) => item.boardNum.toString()} 
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <Text style={styles.label}>제목</Text>
+            <Text style={styles.email}>{item.title}</Text>
+
+            <Text style={styles.label}>내용</Text>
+            <RenderHtml
+              contentWidth={screenWidth * 0.9}
+              source={{ html: item.content }}
+              renderers={customRenderers}
+              tagsStyles={{
+                p: {
+                  fontSize: 14,
+                  color: "#2d3436",
+                  lineHeight: 20,
+                  marginBottom: 8,
+                },
+              }}
+            />
+          </View>
+        )}
+        ListEmptyComponent={
+          <Text style={styles.empty}>작성한 글이 없습니다.</Text>
+        }
+        scrollEnabled={false}
+      />
     </ScrollView>
   );
 };
