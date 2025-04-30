@@ -2,8 +2,10 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Link, useRouter } from "expo-router"; // 여기서는 expo-router의 Link를 사용해야 합니다.
 import * as SecureStore from "expo-secure-store";
-import Prac from "./../app/(tabs)/follow/Prac";
 import { useNavigation } from "@react-navigation/native";
+import { colors } from "../constants/colorConstant";
+import CustomText from "./common/CustomText";
+import Feather from "@expo/vector-icons/Feather";
 
 const MessageButton = ({ receiver }) => {
   const navigation = useNavigation();
@@ -27,7 +29,7 @@ const MessageButton = ({ receiver }) => {
 
   const goToPrac = () => {
     // `push`를 사용하여 쿼리 파라미터와 함께 이동
-    navigation.navigate("WebSocketClient", { sender, receiver });
+    navigation.navigate("follow/WebSocketClient", { sender, receiver });
   };
 
   useEffect(() => {
@@ -36,11 +38,25 @@ const MessageButton = ({ receiver }) => {
 
   return (
     <>
-      <Pressable onPress={goToPrac}>
-        <Text>실험용 버튼</Text>
+      <Pressable onPress={goToPrac} style={styles.dmBTN}>
+        <CustomText col="white" weight="Bold">
+          <Feather name="send" size={21} color="white" />
+        </CustomText>
       </Pressable>
     </>
   );
 };
 
 export default MessageButton;
+
+const styles = StyleSheet.create({
+  dmBTN: {
+    backgroundColor: colors.MAIN,
+    borderRadius: 50,
+    alignSelf: "flex-start",
+    height: 40,
+    width: 40,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -15,8 +15,9 @@ import {
   getUserSubFromToken,
 } from "../../../redux/authHelper";
 import * as SecureStore from "expo-secure-store";
-import Toast from 'react-native-toast-message';  // Toast import
+import Toast from 'react-native-toast-message'; 
 import CommunityItem from "../../../components/CommunityItem";
+import { useFocusEffect } from "expo-router";
 import { useRouter } from "expo-router";
 import { Octicons } from "@expo/vector-icons";
 
@@ -59,22 +60,29 @@ const ProfileHomeScreen = () => {
     fetchUserInfo(); // 실행
   }, []); // 빈 배열로, 컴포넌트가 마운트될 때 한 번만 실행
 
-  // 게시물 목록 가져오기
-  useEffect(() => {
-    const fetchStories = async () => {
-      setLoading(true);
-      try {
-        const response = await getStories(); // API 호출
-        setBoardList(response.data); // 상태 업데이트 (isLike가 각 항목에 포함되어 있어야 함)
-      } catch (error) {
-        alert("오류", "게시물 목록을 가져오는 데 실패했습니다.");
-      } finally {
-        setLoading(false); // 로딩 종료
-      }
-    };
 
-    fetchStories();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      // 화면이 포커스될 때 실행할 코드
+      const fetchStories = async () => {
+        setLoading(true);
+        try {
+          const response = await getStories(); // API 호출
+          setBoardList(response.data); // 상태 업데이트 (isLike가 각 항목에 포함되어 있어야 함)
+        } catch (error) {
+          alert("오류");
+        } finally {
+          setLoading(false); 
+        }
+      };
+  
+      fetchStories();
+      return () => {
+        // 화면이 포커스를 잃을 때 실행할 코드
+      };
+    }, [])
+  );
+
 
   return (
     <View style={styles.container}>
