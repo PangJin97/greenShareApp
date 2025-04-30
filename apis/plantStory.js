@@ -11,8 +11,8 @@ export const getStories = async () => {
 
 //앱에서 내 글만 조회하기
 export const getMyPost = (userEmail) => {
- const response = axiosInstance.get(`/plantStories/user/${userEmail}`);
- return response;
+  const response = axiosInstance.get(`/plantStories/user/${userEmail}`);
+  return response;
 }
 
 export const insertLike = async (boardNum) => {
