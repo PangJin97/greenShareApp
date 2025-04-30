@@ -39,6 +39,7 @@ const ProfileHomeScreen = () => {
   //const [likeLoading, setLikeLoading] = useState({}); // 각 게시물의 좋아요 요청 상태 관리
 
 
+  // 사용자 정보 가져옴
   useFocusEffect(
     useCallback(() => {
       const fetchUserInfo = async () => {
@@ -81,10 +82,8 @@ const ProfileHomeScreen = () => {
     }, [])
   );
 
+  // 팔로우 바뀌면 화면에 반영
   const changeFollowStatus = (followId) => {
-    console.log(followId);
-    console.log(boardList[0].userEmail);
-    console.log(boardList[0].isFollow);
     
     const newBoardList = boardList.map(item => {
       if (item.userEmail === followId) {
@@ -130,12 +129,14 @@ const ProfileHomeScreen = () => {
         keyExtractor={(item) => item.boardNum.toString()}
         contentContainerStyle={{ paddingBottom: 100 }}
       />
+
     )}
 
     <Pressable style={styles.writeBtn} onPress={() => router.push('/community/reg-commu')}>
       <Octicons name="pencil" size={28} color="white" />
     </Pressable>
   </LinearGradient>
+
 
   );
 };

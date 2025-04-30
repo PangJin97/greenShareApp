@@ -33,9 +33,9 @@ const FarmerCommunityInsert = () => {
     try {
       // 이미지 갤러리 열기 (mediaTypes 없이 사용)
       const result = await ImagePicker.launchImageLibraryAsync({
-        allowsEditing: true,     // 사용자가 자를 수 있도록 허용
-        aspect: [4, 3],          // 자를 때 기본 비율
-        quality: 1,              // 원본 품질로 불러오기
+        allowsEditing: true, // 사용자가 자를 수 있도록 허용
+        aspect: [4, 3], // 자를 때 기본 비율
+        quality: 1, // 원본 품질로 불러오기
       });
 
       // 사용자가 이미지를 선택했을 때만 처리
