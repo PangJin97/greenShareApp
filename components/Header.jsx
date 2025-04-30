@@ -1,25 +1,36 @@
-import logo from "./../assets/images/greenshare.png";
-import { startMapper } from "react-native-reanimated";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useState } from "react";
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserNameFromToken, getUserSubFromToken } from "../redux/authHelper";
+import {
+  getUserNameFromToken,
+  getUserSubFromToken,
+} from "../redux/authHelper";
 import * as SecureStore from "expo-secure-store";
 import { logoutReducer } from "../redux/authSlice";
+import logo from "./../assets/images/greenshare.png";
+import { AntDesign } from '@expo/vector-icons';
+
 
 const Header = () => {
   const router = useRouter();
-  const auth = useSelector((state) => state.auth); //{token : null, isLogin : false}
+  const dispatch = useDispatch();
+
+  const auth = useSelector((state) => state.auth);
   const user = useSelector((state) => state.auth.user);
 
-  const dispatch = useDispatch();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogout = () => {
     SecureStore.deleteItemAsync("accessToken")
       .then(() => {
-        alert('로그아웃 되었습니다');
-        console.log("SecureStore 삭제 완료");
+        alert("로그아웃 되었습니다");
         dispatch(logoutReducer());
         router.replace("/");
       })
@@ -27,30 +38,61 @@ const Header = () => {
   };
 
   return (
-    <View style={styles.headerContainer}>
-      <Image source={logo} style={styles.logo} resizeMode="contain" />
-      <View style={styles.loginStatus}>
-        {auth.isLogin ? (
-          <>
-            <Text>{getUserNameFromToken(auth.token)} 님 반갑습니다.</Text>
+    <>
+      <View style={styles.headerContainer}>
+        <Image source={logo} style={styles.logo} resizeMode="contain" />
 
-            <Pressable onPress={handleLogout}>
-              <Text>로그아웃</Text>
-            </Pressable>
-          </>
-        ) : (
-          <>
-            <Pressable onPress={() => router.push("/auth/login")}>
-              <Text>로그인</Text>
-            </Pressable>
+        <View style={styles.loginStatus}>
+          {auth.isLogin ? (
+            <>
+              <Text>{getUserNameFromToken(auth.token)} 님 반갑습니다.</Text>
 
-            <Pressable onPress={() => router.push("/auth/join")}>
-              <Text>회원가입</Text>
-            </Pressable>
-          </>
-        )}
+              <Pressable onPress={() => setShowLogoutModal(true)}>
+                <Text style={{ color: "#EF4444", fontWeight: "bold" }}>
+                  로그아웃
+                </Text>
+              </Pressable>
+            </>
+          ) : (
+            < >
+              <Pressable onPress={() => router.push("/auth/login")}>
+                <Text>로그인</Text>
+              </Pressable>
+
+              <Pressable onPress={() => router.push("/auth/join")}>
+                <Text>회원가입</Text>
+              </Pressable>
+            </>
+          )}
+        </View>
       </View>
-    </View>
+
+      {/* 로그아웃 모달 */}
+      {showLogoutModal && (
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalBox}>
+            <View style={styles.modalIcon}>
+              <AntDesign name="logout" size={32} color="#10B981" />
+            </View>
+            <Text style={styles.modalText}>
+            로그아웃 하시겠어요?
+            </Text>
+            <View style={styles.modalButtons}>
+              <Pressable style={styles.confirmBtn} onPress={handleLogout}>
+                <Text style={{ color: "#fff" }}>확인</Text>
+              </Pressable>
+              <Pressable
+                style={styles.cancelBtn}
+                onPress={() => setShowLogoutModal(false)}
+              >
+                <Text style={{ color: "#555" }}>취소</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      )}
+
+    </>
   );
 };
 
@@ -58,23 +100,58 @@ export default Header;
 
 const styles = StyleSheet.create({
   headerContainer: {
-    height: 30,
+    height: 40,
     backgroundColor: "white",
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: 10,
+    alignItems: "center",
   },
-
   loginStatus: {
     flexDirection: "row",
-    justifyContent: "flex-end",
     gap: 12,
-    paddingRight: 12,
+    alignItems: "center",
   },
   logo: {
-    // 원하는 너비
-    height: 25, // 원하는 높이, 비율에 맞게 대략 맞춰서 지정
-
+    height: 30,
     width: 130,
+  },
+  // 모달 스타일
+  modalBackdrop: {
+    position: "absolute",
+    top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  },
+  modalBox: {
+    width: "80%",
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+    elevation: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    gap: 16,
+  },
+  confirmBtn: {
+    backgroundColor: "#EF4444",
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+  },
+  cancelBtn: {
+    backgroundColor: "#E5E7EB",
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 6,
   },
 });
