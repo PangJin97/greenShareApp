@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Pressable, Alert, Dimensions, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Pressable, Alert, Dimensions, ScrollView, Image, TextInput } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { getDetailStories, deleteStories, insertReply } from '../../../apis/plantStory';
+import { getDetailStories, deleteStories, insertReply, replyList } from '../../../apis/plantStory';
 import RenderHtml from 'react-native-render-html';
+import * as SecureStore from 'expo-secure-store';
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 
 const DetailScreen = () => {
   const { boardNum } = useLocalSearchParams();
   const [detailData, setDetailData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [replyInfo, setReplyInfo] =useState({});// 222222
+  const [reloadTrigger, setReloadTrigger] = useState(false);
+  const [replies, setReplies] = useState([]); // 댓글 목록을 담을 상태
+
   const router = useRouter();
   const screenWidth = Dimensions.get('window').width;
 
@@ -30,8 +37,9 @@ const DetailScreen = () => {
       );
     },
   };
-
-  useEffect(() => {
+// 상세 게시글 (boardNum)에 따른 목록 조회
+useFocusEffect(
+  useCallback(() => {
     const fetchDetail = async () => {
       setLoading(true);
       try {
@@ -44,19 +52,51 @@ const DetailScreen = () => {
         setLoading(false);
       }
     };
+
     fetchDetail();
-  }, [boardNum]);
-
-const reply = ()=>{
-  insertReply()
-  .then(()=>{})
-  .catch(()=>{})
-}
+  }, [boardNum, reloadTrigger])
+);
 
 
 
+//댓글 등록 함수
+const reply = async (replyData) => {
+  try {
+    const res = await insertReply(replyData);
+
+    const token = res.headers?.authorization;
+    if (token) {
+      await SecureStore.setItemAsync('accessToken', token);
+    }
+
+    Alert.alert('성공', '댓글이 등록되었습니다.');
+  } catch (error) {
+    console.error('댓글 등록 오류:', error);
+    Alert.alert('오류', '댓글 등록에 실패했습니다.');
+  }
+};
+
+//게시글 댓글 불러오는 함수
+useFocusEffect(
+  useCallback(() => {
+    const fetchReplies = async () => {
+      try {
+        const res = await replyList(Number(boardNum));
+        setReplies(res.data);
+      } catch (err) {
+        console.error('댓글 불러오기 실패:', err);
+      }
+    };
+
+    if (boardNum) fetchReplies();
+  }, [boardNum, reloadTrigger])
+); 
 
 
+
+
+
+// 상세 게시글 삭제 함수
   const handleDelete = async () => {
     Alert.alert(
       '삭제 확인',
@@ -129,10 +169,41 @@ const reply = ()=>{
         </View>
 
 
-          <View>
-            <Text></Text>
-            <Text></Text>
-          </View>
+        <View style={styles.commentInputContainer}>
+          <TextInput
+            placeholder="댓글을 입력하세요"
+            value={replyInfo.content}
+            onChangeText={(text) =>
+              setReplyInfo({ ...replyInfo, content: text, boardNum: Number(boardNum) })
+            }
+            style={styles.commentInput}
+            multiline
+          />
+
+          <Pressable style={styles.commentButton} onPress={() => reply(replyInfo)}>
+            <Text style={styles.commentButtonText}>등록</Text>
+          </Pressable>
+        </View>
+
+
+
+        <View style={{ marginTop: 30 }}>
+          <Text style={styles.commentTitle}>댓글</Text>
+          
+          {replies.length === 0 ? (
+            <Text style={styles.commentEmpty}>아직 댓글이 없습니다.</Text>
+          ) : (
+            replies.map((reply) => (
+              <View key={reply.replyNum} style={styles.commentCard}>
+                <View style={styles.commentHeader}>
+                  <Text style={styles.commentUser}>{reply.userEmail || '익명'}</Text>
+                  <Text style={styles.commentDate}>{reply.regDate}</Text>
+                </View>
+                <Text style={styles.commentContent}>{reply.content}</Text>
+              </View>
+            ))
+          )}
+        </View>
 
 
 
@@ -243,4 +314,83 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
+  commentTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+  },
+  
+  commentEmpty: {
+    fontSize: 14,
+    color: '#888',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  
+  commentCard: {
+    backgroundColor: '#f5f5f5',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  
+  commentHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  
+  commentUser: {
+    fontWeight: 'bold',
+    color: '#007bff',
+    fontSize: 14,
+  },
+  
+  commentDate: {
+    fontSize: 12,
+    color: '#777',
+  },
+  
+  commentContent: {
+    fontSize: 15,
+    color: '#333',
+    lineHeight: 20,
+  },
+  commentInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  
+  commentInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 10,
+    marginRight: 8,
+    minHeight: 45,
+    backgroundColor: '#fff',
+  },
+  
+  commentButton: {
+    backgroundColor: '#007bff',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  
+  commentButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  
+  
 });
