@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, Modal, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import CustomText from "../../../components/common/CustomText";
 import Octicons from "@expo/vector-icons/Octicons";
@@ -14,6 +14,8 @@ const HomeScreen = () => {
   const data = dummyData;
   return (
     <View style={styles.con}>
+      
+
       {/* 메인 컨테이너 */}
       <FlatList
         data={data} /* 반복할 데이터 */
