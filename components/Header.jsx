@@ -37,6 +37,7 @@ const Header = () => {
       .catch((error) => console.error("SecureStore 오류:", error));
   };
 
+  
   return (
     <>
       <View style={styles.headerContainer}>

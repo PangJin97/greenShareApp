@@ -22,6 +22,7 @@ import { Octicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { LinearGradient } from 'expo-linear-gradient';
+import Entypo from '@expo/vector-icons/Entypo';
 
 
 
@@ -133,7 +134,7 @@ const ProfileHomeScreen = () => {
     )}
 
     <Pressable style={styles.writeBtn} onPress={() => router.push('/community/reg-commu')}>
-      <Octicons name="pencil" size={28} color="white" />
+      <Entypo name="pencil" size={28} color="black" />
     </Pressable>
   </LinearGradient>
 
