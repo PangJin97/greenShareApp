@@ -22,7 +22,10 @@ import RenderHtml from "react-native-render-html";
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
 import { useSelector } from "react-redux";
-import { getUserSubFromToken } from "../../../redux/authHelper"; // ✅ 수정됨
+import {
+  getUserSubFromToken,
+  getUserRoleFromToken,
+} from "../../../redux/authHelper";
 
 const DetailScreen = () => {
   const { boardNum } = useLocalSearchParams();
@@ -36,9 +39,12 @@ const DetailScreen = () => {
   const [replies, setReplies] = useState([]);
 
   const token = useSelector((state) => state.auth.token);
-  const myEmail = getUserSubFromToken(token); // ✅ sub에서 이메일 추출
+  const myEmail = getUserSubFromToken(token);
+  const myRole = getUserRoleFromToken(token);
+
   const isMyPost =
-    detailData?.userEmail?.toLowerCase() === myEmail?.toLowerCase();
+    detailData?.userEmail?.toLowerCase() === myEmail?.toLowerCase() ||
+    myRole === "ROLE_ADMIN";
 
   useFocusEffect(
     useCallback(() => {
@@ -54,7 +60,6 @@ const DetailScreen = () => {
           setLoading(false);
         }
       };
-
       fetchDetail();
     }, [boardNum, reloadTrigger])
   );
