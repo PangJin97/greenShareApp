@@ -32,7 +32,7 @@ const Header = () => {
       if (!token) return null;
 
       const payload = token.split(".")[1];
-      const decodedPayload = atob(payload); // base64 디코딩
+      const decodedPayload = decodeURIComponent(escape(atob(payload))); // base64 디코딩
       const decoded = JSON.parse(decodedPayload);
       console.log("Decoded name:", decoded.userName);
       return decoded.userName;
