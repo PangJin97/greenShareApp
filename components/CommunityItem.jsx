@@ -163,9 +163,24 @@ const CommunityItem = ({ item, changeFollowStatus }) => {
 
   return (
     <View style={styles.item}>
+      {/* 헤더 부분 */}
       <View style={styles.header}>
-        <ContentProfile userEmail={item.userEmail} />
-        <Text style={styles.email}>{item.userEmail}</Text>
+        <View style={styles.row}>
+          <ContentProfile userEmail={item.userEmail} />
+          <View>
+            <CustomText style={styles.email} weight="Bold">
+              {item.userName}
+            </CustomText>
+            <CustomText
+              style={styles.email}
+              weight="Regular"
+              size={12}
+              col="gray"
+            >
+              {item.userEmail}
+            </CustomText>
+          </View>
+        </View>
         {item.userEmail === followList.fromUserEmail ? null : (
           <Pressable onPress={() => followInfo(item.boardNum)}>
             <View
@@ -174,11 +189,12 @@ const CommunityItem = ({ item, changeFollowStatus }) => {
                 isFollowed && styles.followingButton,
               ]}
             >
-              <Text
+              <CustomText
                 style={[styles.followText, isFollowed && styles.followingText]}
+                weight="Black"
               >
                 {isFollowed ? "팔로잉" : "팔로우"}
-              </Text>
+              </CustomText>
             </View>
           </Pressable>
         )}
@@ -191,41 +207,48 @@ const CommunityItem = ({ item, changeFollowStatus }) => {
         </View>
       ))}
 
-      {/* 제목 추출 */}
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.preview}>
-        {/* html 코드 제거 */}
-        {item.content.replace(/<[^>]+>/g, "").substring(0, 100)}
-      </Text>
+      <View style={styles.textCon}>
+        {/* 제목 추출 */}
+        <CustomText style={styles.title} weight="Medium">
+          {item.title}
+        </CustomText>
 
-      <View style={styles.iconContainer}>
-        <Pressable onPress={() => handleLikeToggle(item.boardNum)}>
-          <View style={styles.likeButton}>
-            <Animatable.View animation={heartAnimation ? "zoomIn" : null}>
-              <Octicons
-                name={isLiked ? "heart-fill" : "heart"}
-                size={24}
-                color="red"
-              />
-            </Animatable.View>
-            <CustomText weight="Light" style={isLiked && { color: "red" }} />
-            <Text style={styles.likeCount}>{selectedItem.likeCnt}</Text>
+        <View style={styles.iconContainer}>
+          <Pressable onPress={() => handleLikeToggle(item.boardNum)}>
+            <View style={styles.likeButton}>
+              {/* 좋아요 버튼 */}
+              <Animatable.View animation={heartAnimation ? "zoomIn" : null}>
+                <Octicons
+                  name={isLiked ? "heart-fill" : "heart"}
+                  size={21}
+                  color="red"
+                />
+              </Animatable.View>
+              <CustomText weight="Light" col={isLiked ? "red" : "black"} />
+              <CustomText style={styles.likeCount}>
+                {selectedItem.likeCnt}
+              </CustomText>
+            </View>
+          </Pressable>
+
+          <View style={styles.message}>
+            <Feather
+              name="message-circle"
+              size={24}
+              color="black"
+              style={{ transform: [{ scaleX: -1 }] }}
+            />
+            <CustomText style={{ marginLeft: 2 }}>{item.replyCnt}</CustomText>
           </View>
-        </Pressable>
 
-        <View style={styles.message}>
-          <Feather
-            name="message-circle"
-            size={24}
-            color="black"
-            style={{ transform: [{ scaleX: -1 }] }}
-          />
-          <Text style={{ marginLeft: 4 }}>{item.replyCnt}</Text>
-        </View>
-
-        <View style={styles.viewCountContainer}>
-          <MaterialCommunityIcons name="eye-outline" size={24} color="black" />
-          <CustomText style={styles.eyeText}>{item.readCnt}</CustomText>
+          <View style={styles.viewCountContainer}>
+            <MaterialCommunityIcons
+              name="eye-outline"
+              size={24}
+              color="black"
+            />
+            <CustomText style={styles.eyeText}>{item.readCnt}</CustomText>
+          </View>
         </View>
       </View>
     </View>
@@ -237,62 +260,46 @@ export default CommunityItem;
 const styles = StyleSheet.create({
   item: {
     marginBottom: 16,
-    padding: 12,
-    backgroundColor: "#E8F5E9", // 연한 녹색 배경
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#C8E6C9", // 부드러운 테두리
+    backgroundColor: "white", // 연한 녹색 배경
+    boxShadow: "0px 0px 3px lightgray",
+    marginTop: 4,
   },
   header: {
-    flexDirection: "row",
+    /* 프로필 사진 + 이름 + 팔로우 버튼 */ flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 8,
-  },
-  email: {
-    fontSize: 15,
-    color: "#2E7D32", // 짙은 녹색 텍스트
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
   followButton: {
+    /* 팔로우 버튼(팔로우 하기전) */
     borderRadius: 10,
-    backgroundColor: "#A5D6A7", // 연한 초록
+    backgroundColor: "#11C6AB", // 연한 초록
     paddingVertical: 6,
     paddingHorizontal: 10,
   },
   followText: {
-    fontWeight: "bold",
     color: "#ffffff",
-    fontSize: 13,
+    fontSize: 15,
     textAlign: "center",
   },
   followingButton: {
-    backgroundColor: "#388E3C", // 더 짙은 초록
+    backgroundColor: "#27B06E", // 더 짙은 초록
   },
   followingText: {
     color: "#ffffff",
   },
   imageContainer: {
-    width: screenWidth - 32,
     alignSelf: "center",
-    marginBottom: 12,
     overflow: "hidden",
-    borderRadius: 10,
-    padding: 10,
+    width: "100%",
   },
   image: {
     width: "100%",
     aspectRatio: 1,
-    borderRadius: 10,
   },
   title: {
     fontSize: 17,
-    fontWeight: "bold",
-    color: "#1B5E20",
-    marginBottom: 4,
-  },
-  preview: {
-    fontSize: 14,
-    color: "#4E5D52",
   },
   iconContainer: {
     marginTop: 14,
@@ -306,14 +313,12 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   likeCount: {
-    marginLeft: 6,
     color: "#444",
   },
   message: {
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
-    justifyContent: "center",
   },
   viewCountContainer: {
     flexDirection: "row",
@@ -325,5 +330,13 @@ const styles = StyleSheet.create({
   eyeText: {
     marginLeft: 6,
     color: "#555",
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+  },
+  textCon: {
+    padding: 15,
   },
 });
