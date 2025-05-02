@@ -89,9 +89,7 @@ const CommunityItem = ({ item, changeFollowStatus }) => {
         changeFollowStatus(selectedItem.userEmail);
       }
 
-      // 애니메이션 처리 (여기서 하트 애니메이션을 추가)
-      setHeartAnimation(true);
-      setTimeout(() => setHeartAnimation(false), 1000); // 애니메이션 끝나면 상태 초기화
+   
     } catch (error) {
       console.error("팔로우 처리 중 오류:", error);
       Toast.show({
