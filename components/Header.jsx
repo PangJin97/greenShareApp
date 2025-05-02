@@ -1,22 +1,12 @@
 import React, { useState } from "react";
-import {
-  Image,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getUserNameFromToken,
-  getUserSubFromToken,
-} from "../redux/authHelper";
+
 import * as SecureStore from "expo-secure-store";
 import { logoutReducer } from "../redux/authSlice";
 import logo from "./../assets/images/greenshare.png";
-import { AntDesign } from '@expo/vector-icons';
-
+import { AntDesign } from "@expo/vector-icons";
 
 const Header = () => {
   const router = useRouter();
@@ -36,6 +26,21 @@ const Header = () => {
       })
       .catch((error) => console.error("SecureStore 오류:", error));
   };
+  const getUserNameFromToken = async () => {
+    try {
+      const token = await SecureStore.getItemAsync("accessToken");
+      if (!token) return null;
+
+      const payload = token.split(".")[1];
+      const decodedPayload = decodeURIComponent(escape(atob(payload))); // base64 디코딩
+      const decoded = JSON.parse(decodedPayload);
+      console.log("Decoded name:", decoded.userName);
+      return decoded.userName;
+    } catch (error) {
+      console.error("토큰 디코딩 오류:", error);
+      return null;
+    }
+  };
 
   
   return (
@@ -46,7 +51,7 @@ const Header = () => {
         <View style={styles.loginStatus}>
           {auth.isLogin ? (
             <>
-              <Text>{getUserNameFromToken(auth.token)} 님 반갑습니다.</Text>
+              <Text>{getUserNameFromToken()} 님 반갑습니다.</Text>
 
               <Pressable onPress={() => setShowLogoutModal(true)}>
                 <Text style={{ color: "#EF4444", fontWeight: "bold" }}>
@@ -55,7 +60,7 @@ const Header = () => {
               </Pressable>
             </>
           ) : (
-            < >
+            <>
               <Pressable onPress={() => router.push("/auth/login")}>
                 <Text>로그인</Text>
               </Pressable>
@@ -75,9 +80,7 @@ const Header = () => {
             <View style={styles.modalIcon}>
               <AntDesign name="logout" size={32} color="#10B981" />
             </View>
-            <Text style={styles.modalText}>
-            로그아웃 하시겠어요?
-            </Text>
+            <Text style={styles.modalText}>로그아웃 하시겠어요?</Text>
             <View style={styles.modalButtons}>
               <Pressable style={styles.confirmBtn} onPress={handleLogout}>
                 <Text style={{ color: "#fff" }}>확인</Text>
@@ -92,7 +95,6 @@ const Header = () => {
           </View>
         </View>
       )}
-
     </>
   );
 };
@@ -120,7 +122,10 @@ const styles = StyleSheet.create({
   // 모달 스타일
   modalBackdrop: {
     position: "absolute",
-    top: 0, left: 0, right: 0, bottom: 0,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: "rgba(0,0,0,0.3)",
     justifyContent: "center",
     alignItems: "center",
