@@ -53,7 +53,7 @@ const SerchHomeScreen = () => {
       if (!token) return null;
 
       const payload = token.split(".")[1];
-      const decodedPayload = atob(payload); // base64 디코딩
+      const decodedPayload = decodeURIComponent(escape(atob(payload)));  // base64 디코딩
       const decoded = JSON.parse(decodedPayload);
       console.log("Decoded name:", decoded.userName);
       return decoded.userName;
@@ -101,7 +101,11 @@ const SerchHomeScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
+
       {/* <FollowList userEmail={user} /> */}
+
+      <FollowList userEmail={user} />
+
       <View style={styles.proCon}>
         <ProfileImageViewer userEmail={user} />
 
