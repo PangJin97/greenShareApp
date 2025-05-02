@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Pressable, Alert, Dimensions, ScrollView, Image, TextInput } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { getDetailStories, deleteStories, insertReply, replyList } from '../../../apis/plantStory';
-import RenderHtml from 'react-native-render-html';
-import * as SecureStore from 'expo-secure-store';
-import { useFocusEffect } from "@react-navigation/native";
-=======
 import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
@@ -38,7 +29,6 @@ import {
 } from "../../../redux/authHelper";
 import dayjs from "dayjs";
 import { axiosInstance } from "../../../apis/axiosInstance";
->>>>>>> d2c1d395ad040c80b8bf4d0c6f32cd04429e0bc7
 
 const DetailScreen = () => {
   const { boardNum } = useLocalSearchParams();
@@ -182,16 +172,6 @@ const DetailScreen = () => {
     ]);
   };
 
-  // 날짜 포맷 함수
-  const formatDateDot = (dateStr) => {
-    if (!dateStr) return '';
-    const date = new Date(dateStr);
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    return `${yyyy}.${mm}.${dd}`;
-  };
-
   const customRenderers = {
     img: ({ tnode }) => {
       const imageUri = tnode.attributes.src;
@@ -211,96 +191,6 @@ const DetailScreen = () => {
       );
     },
   };
-<<<<<<< HEAD
-
-  useFocusEffect(
-    useCallback(() => {
-      const fetchDetail = async () => {
-        setLoading(true);
-        try {
-          const response = await getDetailStories(Number(boardNum));
-          setDetailData(response.data);
-        } catch (error) {
-          console.error('상세 조회 실패:', error);
-          Alert.alert('오류', '게시글을 가져오는 데 실패했습니다.');
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchDetail();
-    }, [boardNum, reloadTrigger])
-  );
-
-  const reply = async (replyData) => {
-    const tempReply = {
-      replyNum: Date.now(),
-      userEmail: '나',
-      regDate: formatDateDot(new Date()),
-      content: replyData.content,
-    };
-
-    setReplies(prev => [tempReply, ...prev]);
-    setReplyInfo({});
-
-    try {
-      const res = await insertReply(replyData);
-      const token = res.headers?.authorization;
-      if (token) {
-        SecureStore.setItemAsync('accessToken', token);
-      }
-      setReloadTrigger(prev => !prev);
-    } catch (error) {
-      console.error('댓글 등록 오류:', error);
-      Alert.alert('오류', '댓글 등록에 실패했습니다.');
-      setReplies(prev => prev.filter(reply => reply.replyNum !== tempReply.replyNum));
-    }
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      const fetchReplies = async () => {
-        try {
-          const res = await replyList(Number(boardNum));
-          setReplies(res.data);
-        } catch (err) {
-          console.error('댓글 불러오기 실패:', err);
-        }
-      };
-
-      if (boardNum) fetchReplies();
-    }, [boardNum, reloadTrigger])
-  );
-
-  const handleDelete = async () => {
-    Alert.alert(
-      '삭제 확인',
-      '정말 삭제하시겠습니까?',
-      [
-        { text: '취소', style: 'cancel' },
-        {
-          text: '삭제',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteStories(Number(boardNum));
-              Alert.alert('삭제 완료', '게시글이 삭제되었습니다.');
-              router.back();
-            } catch (error) {
-              console.error('삭제 실패:', error);
-              Alert.alert('삭제 실패', '게시글 삭제 중 오류가 발생했습니다.');
-            }
-          },
-        },
-      ],
-      { cancelable: true }
-    );
-  };
-
-  const handleEdit = () => {
-    router.push(`/community/edit/${boardNum}`);
-  };
-=======
->>>>>>> d2c1d395ad040c80b8bf4d0c6f32cd04429e0bc7
 
   if (loading) {
     return (
@@ -371,59 +261,6 @@ const DetailScreen = () => {
   );
 
   return (
-<<<<<<< HEAD
-    <ScrollView style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>{detailData.title || '제목 없음'}</Text>
-
-        <View style={styles.metaInfo}>
-          <Text style={styles.metaText}>작성자: {detailData.userEmail || '작성자 없음'}</Text>
-          <Text style={styles.metaText}>
-            등록일: {detailData.regDate ? formatDateDot(detailData.regDate) : '등록일 없음'}
-          </Text>
-          <Text style={styles.metaText}>조회수: {detailData.readCnt ?? '0'}</Text>
-        </View>
-
-        <View style={styles.contentArea}>
-          {detailData.content ? (
-            <RenderHtml
-              contentWidth={screenWidth}
-              source={{ html: detailData.content }}
-              renderers={customRenderers}
-            />
-          ) : (
-            <Text>내용 없음</Text>
-          )}
-        </View>
-
-        <View style={styles.commentInputContainer}>
-          <TextInput
-            placeholder="댓글을 입력하세요"
-            value={replyInfo.content}
-            onChangeText={(text) =>
-              setReplyInfo({ ...replyInfo, content: text, boardNum: Number(boardNum) })
-            }
-            style={styles.commentInput}
-            multiline
-          />
-          <Pressable style={styles.commentButton} onPress={() => reply(replyInfo)}>
-            <Text style={styles.commentButtonText}>등록</Text>
-          </Pressable>
-        </View>
-
-        <View style={{ marginTop: 30 }}>
-          <Text style={styles.commentTitle}>댓글</Text>
-          {replies.length === 0 ? (
-            <Text style={styles.commentEmpty}>아직 댓글이 없습니다.</Text>
-          ) : (
-            replies.map((reply) => (
-              <View key={reply.replyNum} style={styles.commentCard}>
-                <View style={styles.commentHeader}>
-                  <Text style={styles.commentUser}>{reply.userEmail || '익명'}</Text>
-                  <Text style={styles.commentDate}>{formatDateDot(reply.regDate)}</Text>
-                </View>
-                <Text style={styles.commentContent}>{reply.content}</Text>
-=======
     <FlatList
       style={styles.container}
       data={replies}
@@ -463,7 +300,6 @@ const DetailScreen = () => {
                 >
                   <Text style={{ color: "#3DA66E" }}>저장</Text>
                 </Pressable>
->>>>>>> d2c1d395ad040c80b8bf4d0c6f32cd04429e0bc7
               </View>
             </>
           ) : (
@@ -490,30 +326,15 @@ const DetailScreen = () => {
             </View>
           )}
         </View>
-<<<<<<< HEAD
-
-        <View style={styles.buttonGroup}>
-          <Pressable style={styles.editBtn} onPress={handleEdit}>
-            <Text style={styles.btnText}>수정</Text>
-          </Pressable>
-          <Pressable style={styles.deleteBtn} onPress={handleDelete}>
-            <Text style={styles.btnText}>삭제</Text>
-          </Pressable>
-        </View>
-      </View>
-    </ScrollView>
-=======
       )}
       ListEmptyComponent={
         <Text style={styles.commentEmpty}>아직 댓글이 없습니다.</Text>
       }
     />
->>>>>>> d2c1d395ad040c80b8bf4d0c6f32cd04429e0bc7
   );
 };
 
 export default DetailScreen;
-
 
 const styles = StyleSheet.create({
   contentContainer: {
