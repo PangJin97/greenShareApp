@@ -101,7 +101,11 @@ const SerchHomeScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
+
+      {/* <FollowList userEmail={user} /> */}
+
       <FollowList userEmail={user} />
+
       <View style={styles.proCon}>
         <ProfileImageViewer userEmail={user} />
 

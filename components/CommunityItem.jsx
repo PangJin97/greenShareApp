@@ -18,6 +18,7 @@ import { Feather } from "@expo/vector-icons";
 import Octicons from "@expo/vector-icons/Octicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import * as Animatable from "react-native-animatable"; // 애니메이션 라이브러리
+import ContentProfile from "./ContentProfile";
 
 // 사진 너비 조절
 const screenWidth = Dimensions.get("window").width;
@@ -163,6 +164,7 @@ const CommunityItem = ({ item, changeFollowStatus }) => {
   return (
     <View style={styles.item}>
       <View style={styles.header}>
+        <ContentProfile userEmail={item.userEmail} />
         <Text style={styles.email}>{item.userEmail}</Text>
         {item.userEmail === followList.fromUserEmail ? null : (
           <Pressable onPress={() => followInfo(item.boardNum)}>
@@ -275,7 +277,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     overflow: "hidden",
     borderRadius: 10,
-    padding : 10
+    padding: 10,
   },
   image: {
     width: "100%",
