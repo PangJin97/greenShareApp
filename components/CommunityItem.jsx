@@ -1,5 +1,5 @@
 import {
-  Dimensions, // 사진조절
+  Dimensions,
   Image,
   Pressable,
   StyleSheet,
@@ -8,39 +8,29 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
-import Toast from "react-native-toast-message"; //알림창
-// apis
+import Toast from "react-native-toast-message";
 import { deleteLike, insertLike } from "../apis/plantStory";
 import { deleteFollows, insertFollows } from "../apis/follow";
-//아이콘
 import CustomText from "./common/CustomText";
-import { Feather } from "@expo/vector-icons"; 
+import { Feather } from "@expo/vector-icons";
 import Octicons from "@expo/vector-icons/Octicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
-//사진 너비 조절
 const screenWidth = Dimensions.get("window").width;
 
 const CommunityItem = ({ item, changeFollowStatus }) => {
-
-  
-  const [selectedItem, setSelectedItem] = useState({}); //게시글을 각각의 게시글
-  // 좋아요 상태
+  const [selectedItem, setSelectedItem] = useState({});
   const [isLiked, setIsLiked] = useState(false);
-  // 팔로우 상태
   const [isFollowed, setIsFollowed] = useState(null);
-  //팔로우 한사람/ 게시글을 작성한 사람의 정보 저장 
   const [followList, setFollowList] = useState({
-    fromUserEmail: "", // 팔로우 할려는 사람
-    toUserEmail: "", // 게시글을 작성한 사람
+    fromUserEmail: "",
+    toUserEmail: "",
   });
 
-    //이메일추출 한 getUserEmailFromToken useEffect실행
   useEffect(() => {
     getUserEmailFromToken();
   }, []);
 
-  //토큰에 저장된 이메일 추출
   const getUserEmailFromToken = async () => {
     try {
       const token = await SecureStore.getItemAsync("accessToken");
@@ -60,18 +50,15 @@ const CommunityItem = ({ item, changeFollowStatus }) => {
   };
 
   useEffect(() => {
-    setSelectedItem(item); //게시글을  setSelectedItem에 저장
-    setIsLiked(item.isLike === "Y"); // 좋아요가 Y인지 확인 Y이면 좋아요 상태로 바뀜
-    setIsFollowed(item.isFollow === "Y"); // 팔로우가 Y인지 확인 Y이면 좋아요 상태로 바뀜
-    // item값이 바뀌면 재실행
+    setSelectedItem(item);
+    setIsLiked(item.isLike === "Y");
+    setIsFollowed(item.isFollow === "Y");
   }, [item]);
 
-    // 로그인안하면 팔로우 불가능
   const followInfo = async (boardNum) => {
     const token = await SecureStore.getItemAsync("accessToken");
     if (!token) {
-      // Toast message 알림창
-      Toast.show({ 
+      Toast.show({
         type: "error",
         position: "top",
         text1: "로그인 필요",
@@ -80,14 +67,13 @@ const CommunityItem = ({ item, changeFollowStatus }) => {
       return;
     }
 
-    //팔로우 취소/  가능 기능
     try {
       if (isFollowed) {
-        await deleteFollows(followList.toUserEmail, followList.fromUserEmail); //팔로우 취소 API
+        await deleteFollows(followList.toUserEmail, followList.fromUserEmail);
         setIsFollowed(false);
         changeFollowStatus(selectedItem.userEmail);
       } else {
-        await insertFollows(selectedItem.userEmail);  //팔로우 가능 API
+        await insertFollows(selectedItem.userEmail);
         setIsFollowed(true);
         changeFollowStatus(selectedItem.userEmail);
       }
@@ -102,19 +88,16 @@ const CommunityItem = ({ item, changeFollowStatus }) => {
     }
   };
 
-  // 이미지 추출 (HTML 태그에서 이미지 URL만 추출)
   const extractImages = (content) => {
-    const regex = /<img[^>]+src="([^">]+)"/g;
+    const regex = /<img[^>]+src=\"([^">]+)\"/g;
     const images = [];
     let match;
-    //문자열 계속 찾을때까지 반복 
     while ((match = regex.exec(content)) !== null) {
       images.push(match[1]);
     }
     return images;
   };
 
-  // 좋아요 토글 (클릭 시 상태 변경)
   const handleLikeToggle = async (boardNum) => {
     const token = await SecureStore.getItemAsync("accessToken");
     if (!token) {
@@ -127,13 +110,12 @@ const CommunityItem = ({ item, changeFollowStatus }) => {
       return;
     }
 
-    //좋아요 취소/ 가능 기능
     try {
       if (isLiked) {
-        await deleteLike(boardNum); // 좋아요 취소 API
+        await deleteLike(boardNum);
         setIsLiked(false);
       } else {
-        await insertLike(boardNum); // 좋아요 추가 API
+        await insertLike(boardNum);
         setIsLiked(true);
       }
     } catch (error) {
@@ -147,25 +129,16 @@ const CommunityItem = ({ item, changeFollowStatus }) => {
     }
   };
 
+  const thumbnail = extractImages(item.content)[0];
+
   return (
     <View style={styles.item}>
       <View style={styles.header}>
         <Text style={styles.email}>{item.userEmail}</Text>
-        {/* 로그인한 이메일하고 팔로우 할려는 사람의 이메일이 같다면  NULL  */}
         {item.userEmail === followList.fromUserEmail ? null : (
           <Pressable onPress={() => followInfo(item.boardNum)}>
-            <View
-              style={[
-                styles.followButton,
-                isFollowed && styles.followingButton, 
-              ]}
-            >
-              <Text
-                style={[
-                  styles.followText,
-                  isFollowed && styles.followingText, 
-                ]}
-              >
+            <View style={[styles.followButton, isFollowed && styles.followingButton]}>
+              <Text style={[styles.followText, isFollowed && styles.followingText]}>
                 {isFollowed ? "팔로잉" : "팔로우"}
               </Text>
             </View>
@@ -173,17 +146,14 @@ const CommunityItem = ({ item, changeFollowStatus }) => {
         )}
       </View>
 
-      {/* 이미지 주소(url)추출 */}
-      {extractImages(item.content).map((imgUrl, index) => (
-        <View key={index} style={styles.imageContainer}>
-          <Image source={{ uri: imgUrl }} style={styles.image} />
+      {thumbnail && (
+        <View style={styles.thumbnailContainer}>
+          <Image source={{ uri: thumbnail }} style={styles.thumbnail} />
         </View>
-      ))}
+      )}
 
-      {/* 제목 추출 */}
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.preview}>
-        {/* html코드제거 */}
         {item.content.replace(/<[^>]+>/g, "").substring(0, 100)}
       </Text>
 
@@ -195,7 +165,7 @@ const CommunityItem = ({ item, changeFollowStatus }) => {
               size={24}
               color="red"
             />
-            <CustomText weight="Light" style={isLiked && { color: "red" }}></CustomText>
+            <CustomText weight="Light" style={isLiked && { color: "red" }} />
             <Text style={styles.likeCount}>{selectedItem.likeCnt}</Text>
           </View>
         </Pressable>
@@ -213,7 +183,6 @@ const CommunityItem = ({ item, changeFollowStatus }) => {
         <View style={styles.viewCountContainer}>
           <MaterialCommunityIcons name="eye-outline" size={24} color="black" />
           <CustomText style={styles.eyeText}>{item.readCnt}</CustomText>
-          
         </View>
       </View>
     </View>
@@ -247,14 +216,15 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 14,
   },
-  imageContainer: {
-    width: screenWidth,
+  thumbnailContainer: {
+    alignItems: "center",
     marginBottom: 12,
   },
-  image: {
-    width: "100%",
-    height: 250,
-    borderRadius: 8,
+  thumbnail: {
+    width: screenWidth * 0.9,
+    height: screenWidth * 0.9,
+    borderRadius: 12,
+    resizeMode: "cover",
   },
   title: {
     fontSize: 18,
@@ -295,12 +265,11 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-end", 
+    justifyContent: "flex-end",
   },
-  // 팔로우 상태일 때 버튼 스타일
   followingButton: {
-    backgroundColor: "#2ab170", 
-    borderWidth: 0
+    backgroundColor: "#2ab170",
+    borderWidth: 0,
   },
   followingText: {
     color: "white",

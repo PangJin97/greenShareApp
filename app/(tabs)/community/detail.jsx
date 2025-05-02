@@ -7,9 +7,9 @@ import {
   Pressable,
   Alert,
   Dimensions,
-  ScrollView,
   Image,
   TextInput,
+  FlatList,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -26,6 +26,7 @@ import {
   getUserSubFromToken,
   getUserRoleFromToken,
 } from "../../../redux/authHelper";
+import dayjs from "dayjs";
 
 const DetailScreen = () => {
   const { boardNum } = useLocalSearchParams();
@@ -155,187 +156,169 @@ const DetailScreen = () => {
     );
   }
 
-  return (
-    <ScrollView style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>{detailData.title || "제목 없음"}</Text>
-
-        <View style={styles.metaInfo}>
-          <Text style={styles.metaText}>
-            작성자: {detailData.userEmail || "작성자 없음"}
-          </Text>
-          <Text style={styles.metaText}>
-            등록일: {detailData.regDate || "등록일 없음"}
-          </Text>
-          <Text style={styles.metaText}>
-            조회수: {detailData.readCnt ?? "0"}
-          </Text>
-        </View>
-
-        <View style={styles.contentArea}>
-          {detailData.content ? (
-            <RenderHtml
-              contentWidth={screenWidth}
-              source={{ html: detailData.content }}
-              renderers={customRenderers}
-            />
-          ) : (
-            <Text>내용 없음</Text>
-          )}
-        </View>
-
-        <View style={styles.commentInputContainer}>
-          <TextInput
-            placeholder="댓글을 입력하세요"
-            value={replyInfo.content}
-            onChangeText={(text) =>
-              setReplyInfo({
-                ...replyInfo,
-                content: text,
-                boardNum: Number(boardNum),
-              })
-            }
-            style={styles.commentInput}
-            multiline
+  const headerComponent = (
+    <View style={styles.card}>
+      <Text style={styles.title}>{detailData.title || "제목 없음"}</Text>
+      <View style={styles.metaInfo}>
+        <Text style={styles.metaText}>작성자: {detailData.userEmail}</Text>
+        <Text style={styles.metaText}>등록일: {dayjs(detailData.regDate).format('YYYY-MM-DD')}</Text>
+        <Text style={styles.metaText}>조회수: {detailData.readCnt ?? "0"}</Text>
+      </View>
+      <View style={styles.contentArea}>
+        {detailData.content ? (
+          <RenderHtml
+            contentWidth={screenWidth}
+            source={{ html: detailData.content }}
+            renderers={customRenderers}
           />
-          <Pressable
-            style={styles.commentButton}
-            onPress={() => reply(replyInfo)}
-          >
-            <Text style={styles.commentButtonText}>등록</Text>
-          </Pressable>
-        </View>
-
-        <View style={{ marginTop: 30 }}>
-          <Text style={styles.commentTitle}>댓글</Text>
-          {replies.length === 0 ? (
-            <Text style={styles.commentEmpty}>아직 댓글이 없습니다.</Text>
-          ) : (
-            replies.map((reply) => (
-              <View key={reply.replyNum} style={styles.commentCard}>
-                <View style={styles.commentHeader}>
-                  <Text style={styles.commentUser}>
-                    {reply.userEmail || "익명"}
-                  </Text>
-                  <Text style={styles.commentDate}>{reply.regDate}</Text>
-                </View>
-                <Text style={styles.commentContent}>{reply.content}</Text>
-              </View>
-            ))
-          )}
-        </View>
-
-        {isMyPost && (
-          <View style={styles.buttonGroup}>
-            <Pressable style={styles.editBtn} onPress={handleEdit}>
-              <Text style={styles.btnText}>수정</Text>
-            </Pressable>
-            <Pressable style={styles.deleteBtn} onPress={handleDelete}>
-              <Text style={styles.btnText}>삭제</Text>
-            </Pressable>
-          </View>
+        ) : (
+          <Text>내용 없음</Text>
         )}
       </View>
-    </ScrollView>
+      <View style={styles.commentInputContainer}>
+        <TextInput
+          placeholder="댓글을 입력하세요"
+          value={replyInfo.content}
+          onChangeText={(text) =>
+            setReplyInfo({ ...replyInfo, content: text, boardNum: Number(boardNum) })
+          }
+          style={styles.commentInput}
+          multiline
+        />
+        <Pressable style={styles.commentButton} onPress={() => reply(replyInfo)}>
+          <Text style={styles.commentButtonText}>댓글 등록</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+
+  const footerComponent = isMyPost && (
+    <View style={styles.buttonGroup}>
+      <Pressable style={styles.editBtn} onPress={handleEdit}>
+        <Text style={styles.btnText}>수정하기</Text>
+      </Pressable>
+      <Pressable style={styles.deleteBtn} onPress={handleDelete}>
+        <Text style={styles.btnText}>삭제하기</Text>
+      </Pressable>
+    </View>
+  );
+
+  return (
+    <FlatList
+      style={styles.container}
+      data={replies}
+      ListHeaderComponent={headerComponent}
+      ListFooterComponent={footerComponent}
+      keyExtractor={(item, index) => item.replyNum?.toString() ?? index.toString()}
+      renderItem={({ item }) => (
+        <View style={styles.commentCard}>
+          <View style={styles.commentHeader}>
+            <Text style={styles.commentUser}>{item.userEmail || "익명"}</Text>
+            <Text style={styles.commentDate}>{dayjs(item.regDate).format("YYYY-MM-DD")}</Text>
+          </View>
+          <Text style={styles.commentContent}>{item.content}</Text>
+        </View>
+      )}
+      ListEmptyComponent={
+        <Text style={styles.commentEmpty}>아직 댓글이 없습니다.</Text>
+      }
+    />
   );
 };
 
 export default DetailScreen;
 
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#eef6f7",
-    padding: 16,
+  contentContainer: {
+    padding: 20,
+    backgroundColor: '#F1F8F4',
   },
   center: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
   },
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: "#555",
+    color: "#5E716A",
   },
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
     borderRadius: 12,
     padding: 20,
     marginBottom: 20,
   },
   title: {
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: "bold",
-    color: "#333",
-    marginBottom: 12,
+    color: "#2E473D",
+    marginBottom: 10,
     textAlign: "center",
   },
   metaInfo: {
     marginBottom: 16,
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderBottomWidth: 1,
-    borderColor: "#eee",
+    borderColor: "#DCE8E2",
   },
   metaText: {
-    fontSize: 14,
-    color: "#777",
-    marginBottom: 4,
+    fontSize: 13,
+    color: "#677E75",
     textAlign: "center",
   },
   contentArea: {
-    marginBottom: 30,
-    paddingHorizontal: 8,
-    paddingVertical: 12,
-    backgroundColor: "#f9f9f9",
+    marginVertical: 20,
+    padding: 12,
+    backgroundColor: "#F6FCF8",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#D0E6DA",
   },
-  buttonGroup: {
+  commentInputContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    alignItems: "flex-start",
     marginTop: 20,
+    marginBottom: 16,
   },
-  editBtn: {
-    width: "45%",
-    backgroundColor: "#90ee90",
-    paddingVertical: 12,
+  commentInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#A8D0BA",
     borderRadius: 10,
+    padding: 10,
+    marginRight: 10,
+    backgroundColor: "#ffffff",
+    fontSize: 14,
+  },
+  commentButton: {
+    backgroundColor: "#3DA66E",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    justifyContent: "center",
     alignItems: "center",
   },
-  deleteBtn: {
-    width: "45%",
-    backgroundColor: "#ff6b6b",
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  btnText: {
-    color: "#fff",
+  commentButtonText: {
+    color: "#ffffff",
     fontWeight: "bold",
-    fontSize: 16,
+    fontSize: 14,
   },
   commentTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: "bold",
-    marginBottom: 10,
-    color: "#333",
-  },
-  commentEmpty: {
-    fontSize: 14,
-    color: "#888",
-    textAlign: "center",
-    marginBottom: 10,
+    marginBottom: 12,
+    color: "#2E6651",
   },
   commentCard: {
-    backgroundColor: "#f5f5f5",
-    padding: 12,
+    backgroundColor: "#ffffff",
+    padding: 14,
     borderRadius: 10,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#D5EDE0",
   },
   commentHeader: {
     flexDirection: "row",
@@ -344,45 +327,47 @@ const styles = StyleSheet.create({
   },
   commentUser: {
     fontWeight: "bold",
-    color: "#007bff",
-    fontSize: 14,
+    color: "#3A7660",
+    fontSize: 13,
   },
   commentDate: {
     fontSize: 12,
-    color: "#777",
+    color: "#888888",
   },
   commentContent: {
-    fontSize: 15,
-    color: "#333",
+    fontSize: 14,
+    color: "#444",
     lineHeight: 20,
   },
-  commentInputContainer: {
+  commentEmpty: {
+    fontSize: 13,
+    color: "#999999",
+    textAlign: "center",
+    marginVertical: 12,
+  },
+  buttonGroup: {
     flexDirection: "row",
-    alignItems: "flex-start",
-    marginTop: 20,
-    marginBottom: 10,
+    justifyContent: "space-around",
+    marginTop: 24,
+    marginBottom: 36,
   },
-  commentInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    marginRight: 8,
-    minHeight: 45,
-    backgroundColor: "#fff",
-  },
-  commentButton: {
-    backgroundColor: "#007bff",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 8,
-    justifyContent: "center",
+  editBtn: {
+    width: "45%",
+    backgroundColor: "#9CCC65",
+    paddingVertical: 12,
+    borderRadius: 10,
     alignItems: "center",
   },
-  commentButtonText: {
-    color: "#fff",
+  deleteBtn: {
+    width: "45%",
+    backgroundColor: "#EF5350",
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  btnText: {
+    color: "#ffffff",
     fontWeight: "bold",
-    fontSize: 14,
+    fontSize: 15,
   },
 });
