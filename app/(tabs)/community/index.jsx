@@ -141,50 +141,48 @@ const ProfileHomeScreen = () => {
   );
 };
 
+
+
+// 스타일 정의
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "#E6F4EC", // 식물 커뮤니티에 어울리는 연한 초록 배경
+    backgroundColor: "#fff",
   },
   header: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#2E7D32", // 짙은 녹색 계열
-    marginBottom: 20,
-    textAlign: "center",
+    marginBottom: 16,
+    
   },
   loader: {
     marginTop: 20,
   },
   item: {
     marginBottom: 16,
-    padding: 12,
-    backgroundColor: "#ffffff",
-    borderRadius: 12,
+    padding: 10,
     borderWidth: 1,
-    borderColor: "#C8E6C9", // 연한 그린 테두리
+    borderColor: "#ddd",
+    borderRadius: 10,
   },
   title: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#388E3C",
     marginBottom: 8,
   },
   email: {
     fontSize: 14,
-    color: "#6B8E23",
-    marginBottom: 4,
+    color: "#888",
+    marginBottom: 8,
   },
   preview: {
     fontSize: 14,
-    color: "#4E5D52",
+    color: "#444",
   },
   imageContainer: {
     width: screenWidth - 32,
     marginBottom: 12,
-    borderRadius: 8,
-    overflow: "hidden",
   },
   image: {
     width: "100%",
@@ -200,21 +198,26 @@ const styles = StyleSheet.create({
   likeCount: {
     marginLeft: 8,
     fontSize: 16,
-    color: "#555",
+    color: "#444",
   },
   writeBtn: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 30,
     right: 20,
-    backgroundColor: "#66BB6A", // 밝은 그린
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    // shadow 제거
+    backgroundColor: '#007bff',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 8, // Android 그림자
+    shadowColor: '#000', // iOS 그림자
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
   },
+  
+  
 });
-
 
 export default ProfileHomeScreen;
