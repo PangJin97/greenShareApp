@@ -1,22 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Pressable, Alert, Dimensions, ScrollView, Image, TextInput } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { getDetailStories, deleteStories, insertReply, replyList } from '../../../apis/plantStory';
 import RenderHtml from 'react-native-render-html';
 import * as SecureStore from 'expo-secure-store';
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback } from "react";
 
 const DetailScreen = () => {
   const { boardNum } = useLocalSearchParams();
   const [detailData, setDetailData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [replyInfo, setReplyInfo] =useState({});// 222222
+  const [replyInfo, setReplyInfo] = useState({});
   const [reloadTrigger, setReloadTrigger] = useState(false);
-  const [replies, setReplies] = useState([]); // 댓글 목록을 담을 상태
+  const [replies, setReplies] = useState([]);
 
   const router = useRouter();
   const screenWidth = Dimensions.get('window').width;
+
+  // 날짜 포맷 함수
+  const formatDateDot = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}.${mm}.${dd}`;
+  };
 
   const customRenderers = {
     img: ({ tnode }) => {
@@ -37,66 +46,65 @@ const DetailScreen = () => {
       );
     },
   };
-// 상세 게시글 (boardNum)에 따른 목록 조회
-useFocusEffect(
-  useCallback(() => {
-    const fetchDetail = async () => {
-      setLoading(true);
-      try {
-        const response = await getDetailStories(Number(boardNum));
-        setDetailData(response.data);
-      } catch (error) {
-        console.error('상세 조회 실패:', error);
-        Alert.alert('오류', '게시글을 가져오는 데 실패했습니다.');
-      } finally {
-        setLoading(false);
-      }
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchDetail = async () => {
+        setLoading(true);
+        try {
+          const response = await getDetailStories(Number(boardNum));
+          setDetailData(response.data);
+        } catch (error) {
+          console.error('상세 조회 실패:', error);
+          Alert.alert('오류', '게시글을 가져오는 데 실패했습니다.');
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchDetail();
+    }, [boardNum, reloadTrigger])
+  );
+
+  const reply = async (replyData) => {
+    const tempReply = {
+      replyNum: Date.now(),
+      userEmail: '나',
+      regDate: formatDateDot(new Date()),
+      content: replyData.content,
     };
 
-    fetchDetail();
-  }, [boardNum, reloadTrigger])
-);
+    setReplies(prev => [tempReply, ...prev]);
+    setReplyInfo({});
 
-
-
-//댓글 등록 함수
-const reply = async (replyData) => {
-  try {
-    const res = await insertReply(replyData);
-
-    const token = res.headers?.authorization;
-    if (token) {
-      await SecureStore.setItemAsync('accessToken', token);
+    try {
+      const res = await insertReply(replyData);
+      const token = res.headers?.authorization;
+      if (token) {
+        SecureStore.setItemAsync('accessToken', token);
+      }
+      setReloadTrigger(prev => !prev);
+    } catch (error) {
+      console.error('댓글 등록 오류:', error);
+      Alert.alert('오류', '댓글 등록에 실패했습니다.');
+      setReplies(prev => prev.filter(reply => reply.replyNum !== tempReply.replyNum));
     }
+  };
 
-    Alert.alert('성공', '댓글이 등록되었습니다.');
-  } catch (error) {
-    console.error('댓글 등록 오류:', error);
-    Alert.alert('오류', '댓글 등록에 실패했습니다.');
-  }
-};
+  useFocusEffect(
+    useCallback(() => {
+      const fetchReplies = async () => {
+        try {
+          const res = await replyList(Number(boardNum));
+          setReplies(res.data);
+        } catch (err) {
+          console.error('댓글 불러오기 실패:', err);
+        }
+      };
 
-//게시글 댓글 불러오는 함수
-useFocusEffect(
-  useCallback(() => {
-    const fetchReplies = async () => {
-      try {
-        const res = await replyList(Number(boardNum));
-        setReplies(res.data);
-      } catch (err) {
-        console.error('댓글 불러오기 실패:', err);
-      }
-    };
+      if (boardNum) fetchReplies();
+    }, [boardNum, reloadTrigger])
+  );
 
-    if (boardNum) fetchReplies();
-  }, [boardNum, reloadTrigger])
-); 
-
-
-
-
-
-// 상세 게시글 삭제 함수
   const handleDelete = async () => {
     Alert.alert(
       '삭제 확인',
@@ -150,24 +158,23 @@ useFocusEffect(
 
         <View style={styles.metaInfo}>
           <Text style={styles.metaText}>작성자: {detailData.userEmail || '작성자 없음'}</Text>
-          <Text style={styles.metaText}>등록일: {detailData.regDate || '등록일 없음'}</Text>
+          <Text style={styles.metaText}>
+            등록일: {detailData.regDate ? formatDateDot(detailData.regDate) : '등록일 없음'}
+          </Text>
           <Text style={styles.metaText}>조회수: {detailData.readCnt ?? '0'}</Text>
         </View>
 
         <View style={styles.contentArea}>
           {detailData.content ? (
-
             <RenderHtml
               contentWidth={screenWidth}
               source={{ html: detailData.content }}
               renderers={customRenderers}
             />
-            
           ) : (
-            <Text>내용 없음11</Text>
+            <Text>내용 없음</Text>
           )}
         </View>
-
 
         <View style={styles.commentInputContainer}>
           <TextInput
@@ -179,17 +186,13 @@ useFocusEffect(
             style={styles.commentInput}
             multiline
           />
-
           <Pressable style={styles.commentButton} onPress={() => reply(replyInfo)}>
             <Text style={styles.commentButtonText}>등록</Text>
           </Pressable>
         </View>
 
-
-
         <View style={{ marginTop: 30 }}>
           <Text style={styles.commentTitle}>댓글</Text>
-          
           {replies.length === 0 ? (
             <Text style={styles.commentEmpty}>아직 댓글이 없습니다.</Text>
           ) : (
@@ -197,17 +200,13 @@ useFocusEffect(
               <View key={reply.replyNum} style={styles.commentCard}>
                 <View style={styles.commentHeader}>
                   <Text style={styles.commentUser}>{reply.userEmail || '익명'}</Text>
-                  <Text style={styles.commentDate}>{reply.regDate}</Text>
+                  <Text style={styles.commentDate}>{formatDateDot(reply.regDate)}</Text>
                 </View>
                 <Text style={styles.commentContent}>{reply.content}</Text>
               </View>
             ))
           )}
         </View>
-
-
-
-
 
         <View style={styles.buttonGroup}>
           <Pressable style={styles.editBtn} onPress={handleEdit}>
@@ -223,6 +222,7 @@ useFocusEffect(
 };
 
 export default DetailScreen;
+
 
 const styles = StyleSheet.create({
   container: {
