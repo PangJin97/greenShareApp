@@ -6,7 +6,6 @@ import { useFocusEffect } from "@react-navigation/native";
 const ProfileImageViewer = ({ userEmail }) => {
   const [imageData, setImageData] = useState(null);
   const [loading, setLoading] = useState(true);
-  console.log(1);
   const fetchProfileImage = async () => {
     try {
       const res = await axiosInstance.get("/profiles", {
