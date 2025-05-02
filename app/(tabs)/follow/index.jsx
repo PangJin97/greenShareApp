@@ -18,19 +18,45 @@ import { useFocusEffect } from "expo-router";
 import RenderHtml from "react-native-render-html";
 import CustomText from "../../../components/common/CustomText";
 import FollowList from "./followList";
+import ProfileButton from "../../../components/ProfileButton";
+import ProfileImageViewer from "../../../components/ProfileImageViewer.jsx";
+import { useSelector } from "react-redux";
+import { getUserNameFromToken } from "../../../redux/authHelper.js";
 
 const screenWidth = Dimensions.get("window").width;
 
 const SerchHomeScreen = () => {
   const [post, setMyPost] = useState([]);
+  /* userEmail을 받아오는 함수 */
+  const [user, setUser] = useState(null); /* 유저를 받아올 통 */
 
+  /* 유저이메일을 토큰에서 받아오는 함수 */
   const getUserEmailFromToken = async () => {
     try {
       const token = await SecureStore.getItemAsync("accessToken");
       if (!token) return null;
+
       const payload = token.split(".")[1];
-      const decoded = JSON.parse(atob(payload));
+      const decodedPayload = atob(payload); // base64 디코딩
+      const decoded = JSON.parse(decodedPayload);
+      console.log("Decoded email:", decoded.sub);
       return decoded.sub;
+    } catch (error) {
+      console.error("토큰 디코딩 오류:", error);
+      return null;
+    }
+  };
+
+  const getUserNameFromToken = async () => {
+    try {
+      const token = await SecureStore.getItemAsync("accessToken");
+      if (!token) return null;
+
+      const payload = token.split(".")[1];
+      const decodedPayload = atob(payload); // base64 디코딩
+      const decoded = JSON.parse(decodedPayload);
+      console.log("Decoded name:", decoded.userName);
+      return decoded.userName;
     } catch (error) {
       console.error("토큰 디코딩 오류:", error);
       return null;
@@ -61,6 +87,7 @@ const SerchHomeScreen = () => {
     useCallback(() => {
       getUserEmailFromToken().then((userEmail) => {
         if (!userEmail) return;
+        setUser(userEmail);
         getMyPost(userEmail)
           .then((res) => {
             setMyPost(res.data);
@@ -74,8 +101,36 @@ const SerchHomeScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
-      {/* 컴포넌트로 만든 팔로우 리스트 */}
-      <FollowList />
+      {/* <FollowList userEmail={user} /> */}
+      <View style={styles.proCon}>
+        <ProfileImageViewer userEmail={user} />
+
+        <View style={styles.fontCon}>
+          <View>
+            <CustomText weight="Bold" size={22}>
+              {getUserNameFromToken()}
+            </CustomText>
+            <CustomText weight="Light" size={14} col="gray">
+              {getUserEmailFromToken()}
+            </CustomText>
+          </View>
+          <ProfileButton setUser={setUser}/>
+        </View>
+        <View style={styles.fontCon}>
+          <View>
+            <CustomText weight="Bold" size={22}>
+              {getUserNameFromToken()}
+            </CustomText>
+            <CustomText weight="Light" size={14} col="gray">
+              {getUserEmailFromToken()}
+            </CustomText>
+          </View>
+          <ProfileButton />
+        </View>
+
+        {/* 컴포넌트로 만든 팔로우 리스트 */}
+      </View>
+
       <Text style={styles.title}>내가 작성한 글</Text>
 
       <FlatList
@@ -166,5 +221,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  proCon: {
+    flexDirection: "row",
+    paddingHorizontal: 10,
+    gap: 20,
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  fontCon: {
+    justifyContent: "space-around",
+    height: 90,
+    width: 120,
+    gap: 10,
   },
 });
