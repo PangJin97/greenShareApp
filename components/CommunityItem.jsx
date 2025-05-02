@@ -22,6 +22,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 const screenWidth = Dimensions.get("window").width;
 
 const CommunityItem = ({ item, changeFollowStatus }) => {
+
   
   const [selectedItem, setSelectedItem] = useState({}); //게시글을 각각의 게시글
   // 좋아요 상태
@@ -212,6 +213,7 @@ const CommunityItem = ({ item, changeFollowStatus }) => {
         <View style={styles.viewCountContainer}>
           <MaterialCommunityIcons name="eye-outline" size={24} color="black" />
           <CustomText style={styles.eyeText}>{item.readCnt}</CustomText>
+          
         </View>
       </View>
     </View>
