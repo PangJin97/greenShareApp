@@ -30,7 +30,7 @@ const Header = () => {
   const handleLogout = () => {
     SecureStore.deleteItemAsync("accessToken")
       .then(() => {
-        alert("로그아웃 되었습니다");
+        setShowLogoutModal(false);
         dispatch(logoutReducer());
         router.replace("/");
       })

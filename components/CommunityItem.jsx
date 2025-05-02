@@ -165,7 +165,6 @@
       <View style={styles.item}>
         <View style={styles.header}>
           <Text style={styles.email}>{item.userEmail}</Text>
-          {/* 로그인한 이메일하고 팔로우 할려는 사람의 이메일이 같다면  NULL */}
           {item.userEmail === followList.fromUserEmail ? null : (
             <Pressable onPress={() => followInfo(item.boardNum)}>
               <View
