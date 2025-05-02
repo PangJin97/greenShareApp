@@ -69,6 +69,9 @@ const AuthManager = ({ children }) => {
 };
 
 export default function RootLayout() {
+
+
+
   const [fontsLoaded] = useFonts({
     /* 라이브러리 다운받아야함 */
     "Pretendard-Thin": require("./../assets/fonts/Pretendard-Thin.ttf"),
