@@ -55,9 +55,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   image: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
     borderRadius: 50,
     backgroundColor: "#ccc",
+    borderWidth: StyleSheet.hairlineWidth,
   },
 });
