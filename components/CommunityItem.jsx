@@ -293,6 +293,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     overflow: "hidden",
     width: "100%",
+    marginBottom: 12,
   },
   image: {
     width: "100%",
@@ -302,7 +303,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
   },
   iconContainer: {
-    marginTop: 14,
+    /* 아이콘 담긴 컨테이너 */ marginTop: 12,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -337,6 +338,7 @@ const styles = StyleSheet.create({
     gap: 7,
   },
   textCon: {
-    padding: 15,
+    paddingHorizontal: 15,
+    paddingBottom: 15,
   },
 });
