@@ -10,12 +10,12 @@ import {
 } from "react-native";
 import React, { useState, useCallback } from "react";
 import { useFocusEffect, useRouter } from "expo-router";
-import { getPopularPosts } from "../../../apis/plantStory";
+import { deleteLike, getPopularPosts, insertLike } from "../../../apis/plantStory";
 import dayjs from "dayjs";
+import { AntDesign } from "@expo/vector-icons";
 
 const screenWidth = Dimensions.get("window").width;
 
-// 첫 번째 이미지를 추출하는 유틸 함수
 const extractThumbnail = (html) => {
   const regex = /<img[^>]+src=\"([^\">]+)\"/i;
   const match = regex.exec(html);
@@ -27,31 +27,53 @@ const HomeScreen = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useFocusEffect(
-    useCallback(() => {
-      setLoading(true);
-      getPopularPosts()
-        .then((res) => {
-          setPosts(res.data);
-        })
-        .catch((err) => {
-          console.error("인기글 조회 실패:", err);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }, [])
-  );
 
-  const renderItem = ({ item }) => {
+  useFocusEffect(
+  useCallback(() => {
+    setLoading(true);
+    getPopularPosts()
+      .then((res) => {
+        setPosts(res.data); 
+      })
+      .catch((err) => {
+        console.error("인기글 조회 실패:", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [])
+);
+
+
+  const toggleLike = async (boardNum, index) => {
+    try {
+      const updatedPosts = [...posts];
+      const post = updatedPosts[index];
+
+      if (post.isLiked) {
+        await deleteLike(boardNum);
+        post.likeCnt -= 1;
+      } else {
+        await insertLike(boardNum);
+        post.likeCnt += 1;
+      }
+
+      post.isLiked = !post.isLiked;
+      setPosts(updatedPosts);
+    } catch (error) {
+      console.error("좋아요 처리 실패:", error);
+    }
+  };
+
+  const renderItem = ({ item, index }) => {
     const thumbnail = extractThumbnail(item.content);
     const textContent = item.content.replace(/<[^>]+>/g, "").slice(0, 60) + "...";
 
     return (
-      <TouchableOpacity
-        onPress={() => router.push(`/community/${item.boardNum}`)}
-      >
-        <View style={styles.card}>
+      <View style={styles.card}>
+        <TouchableOpacity
+          onPress={() => router.push(`/community/${item.boardNum}`)}
+        >
           <View style={styles.row}>
             {thumbnail && (
               <Image source={{ uri: thumbnail }} style={styles.thumbnail} />
@@ -61,16 +83,30 @@ const HomeScreen = () => {
               <Text style={styles.preview}>{textContent}</Text>
             </View>
           </View>
+        </TouchableOpacity>
 
-          <View style={styles.metaContainer}>
-            <Text style={styles.meta}>작성자: {item.userEmail}</Text>
-            <Text style={styles.meta}>❤️ {item.likeCnt}개</Text>
-            <Text style={styles.meta}>
-              📅 {dayjs(item.regDate).format("YYYY.MM.DD")}
-            </Text>
-          </View>
+        <View style={styles.metaContainer}>
+          <Text style={styles.meta}>작성자: {item.userEmail}</Text>
+
+          {/* ✅ 좋아요 하트 */}
+          <TouchableOpacity onPress={() => toggleLike(item.boardNum, index)}>
+            <View style={styles.likeRow}>
+              <AntDesign
+                name={item.isLiked ? "heart" : "hearto"}
+                size={16}
+                color={item.isLiked ? "red" : "#5e7b61"}
+              />
+              <Text style={[styles.meta, { marginLeft: 4 }]}>
+                {item.likeCnt}개
+              </Text>
+            </View>
+          </TouchableOpacity>
+
+          <Text style={styles.meta}>
+            📅 {dayjs(item.regDate).format("YYYY.MM.DD")}
+          </Text>
         </View>
-      </TouchableOpacity>
+      </View>
     );
   };
 
@@ -153,5 +189,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#5e7b61",
     marginBottom: 3,
+  },
+  likeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 5,
   },
 });
