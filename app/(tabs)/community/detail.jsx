@@ -31,61 +31,60 @@ import dayjs from "dayjs"; // 날짜 포맷팅용
 import { axiosInstance } from "../../../apis/axiosInstance"; // Axios 인스턴스
 import ProfileImageViewer from "../../../components/ProfileImageViewer"; // 프로필 이미지 컴포넌트
 
+// 메인 컴포넌트 시작
 const DetailScreen = () => {
-  const { boardNum } = useLocalSearchParams(); // 게시글 ID 가져오기
+  const { boardNum } = useLocalSearchParams(); // URL에서 게시글 번호 가져오기
   const router = useRouter(); // 페이지 이동 함수
-  const screenWidth = Dimensions.get("window").width; // 화면 너비
+  const screenWidth = Dimensions.get("window").width; // 현재 화면 너비 가져오기
 
-  // 게시글 정보
-  const [detailData, setDetailData] = useState(null);
-  const [loading, setLoading] = useState(true); // 로딩 상태
+  //  게시글 & 댓글 상태값 정의
+  const [detailData, setDetailData] = useState(null); // 게시글 데이터
+  const [loading, setLoading] = useState(true); // 로딩 여부
 
-  // 댓글 관련 상태
-  const [replyInfo, setReplyInfo] = useState({});
+  const [replyInfo, setReplyInfo] = useState({}); // 댓글 작성 내용
   const [reloadTrigger, setReloadTrigger] = useState(false); // 새로고침 트리거
-  const [replies, setReplies] = useState([]);
+  const [replies, setReplies] = useState([]); // 댓글 리스트
 
-  // 댓글 수정 관련 상태
   const [editMode, setEditMode] = useState(null); // 현재 수정 중인 댓글 ID
-  const [editContent, setEditContent] = useState(""); // 수정 중 내용
+  const [editContent, setEditContent] = useState(""); // 수정 중 댓글 내용
 
-  // 로그인 정보 가져오기
+  //  내 계정 정보 (Redux에서 가져오기)
   const token = useSelector((state) => state.auth.token);
   const myEmail = getUserSubFromToken(token); // 내 이메일
   const myRole = getUserRoleFromToken(token); // 내 권한
 
-  // 내가 쓴 글 or 관리자 여부 확인
+  // 내가 작성한 글인지 + 관리자 권한인지 확인
   const isMyPost =
     detailData?.userEmail?.toLowerCase() === myEmail?.toLowerCase() ||
     myRole === "ROLE_ADMIN";
 
   /**
-   * 게시글 상세 가져오기 (useFocusEffect는 화면에 들어올 때마다 실행됨)
+   *  게시글 상세 가져오기
    */
   useFocusEffect(
     useCallback(() => {
-      setLoading(true);
+      setLoading(true); // 로딩 상태 true로 변경
       getDetailStories(Number(boardNum))
         .then((response) => {
-          setDetailData(response.data); // 게시글 내용 저장
+          setDetailData(response.data); // 게시글 데이터 저장
         })
         .catch(() => {
           Alert.alert("오류", "게시글을 가져오는 데 실패했습니다.");
         })
         .finally(() => {
-          setLoading(false);
+          setLoading(false); // 로딩 종료
         });
     }, [boardNum, reloadTrigger])
   );
 
   /**
-   * 댓글 리스트 가져오기
+   *  댓글 가져오기
    */
   useFocusEffect(
     useCallback(() => {
       replyList(Number(boardNum))
         .then((res) => {
-          setReplies(res.data); // 댓글 리스트 저장
+          setReplies(res.data); // 댓글 저장
         })
         .catch((err) => {
           console.error("댓글 불러오기 실패:", err);
@@ -94,7 +93,7 @@ const DetailScreen = () => {
   );
 
   /**
-   * 댓글 작성
+   *  댓글 작성
    */
   const reply = (replyData) => {
     insertReply(replyData)
@@ -104,7 +103,7 @@ const DetailScreen = () => {
           SecureStore.setItemAsync("accessToken", newToken); // 토큰 갱신
         }
         Alert.alert("성공", "댓글이 등록되었습니다.");
-        setReplyInfo({});
+        setReplyInfo({}); // 댓글 입력창 초기화
         setReloadTrigger((prev) => !prev); // 새로고침 트리거
       })
       .catch(() => {
@@ -125,7 +124,7 @@ const DetailScreen = () => {
           deleteStories(Number(boardNum))
             .then(() => {
               Alert.alert("삭제 완료", "게시글이 삭제되었습니다.");
-              router.back(); // 이전 화면으로 이동
+              router.back(); // 이전 페이지로 이동
             })
             .catch(() => {
               Alert.alert("삭제 실패", "게시글 삭제 중 오류가 발생했습니다.");
@@ -159,11 +158,11 @@ const DetailScreen = () => {
   };
 
   /**
-   * 댓글 수정 진입 (댓글 수정 버튼 눌렀을 때 실행)
+   * 댓글 수정 시작 (버튼 클릭 시 실행)
    */
   const handleEditReply = (item) => {
-    setEditMode(item.commentId); // 수정할 댓글의 ID 세팅
-    setEditContent(item.content); // 기존 댓글 내용을 입력창에 미리 채움
+    setEditMode(item.commentId); // 수정할 댓글 ID
+    setEditContent(item.content); // 기존 댓글 내용 세팅
   };
 
   /**
@@ -189,9 +188,9 @@ const DetailScreen = () => {
             )
             .then(() => {
               Alert.alert("성공", "댓글이 수정되었습니다.");
-              setEditMode(null);
-              setEditContent("");
-              setReloadTrigger((prev) => !prev); // 새로고침 트리거
+              setEditMode(null); // 수정 모드 해제
+              setEditContent(""); // 입력창 초기화
+              setReloadTrigger((prev) => !prev); // 새로고침
             })
             .catch(() => {
               Alert.alert("실패", "댓글 수정 중 오류가 발생했습니다.");
@@ -202,7 +201,7 @@ const DetailScreen = () => {
   };
 
   /**
-   * 게시글 본문 이미지 렌더링 설정
+   * HTML 이미지 렌더링 (게시글 본문)
    */
   const customRenderers = {
     img: ({ tnode }) => {
@@ -224,7 +223,7 @@ const DetailScreen = () => {
     },
   };
 
-  // 로딩 중일 때 보여주는 화면
+  // 로딩 화면
   if (loading) {
     return (
       <View style={styles.center}>
