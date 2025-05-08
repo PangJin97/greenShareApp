@@ -118,7 +118,7 @@ const SerchHomeScreen = () => {
 
       {/* 프로필 이미지 + 이름 + 이메일 + 버튼 */}
       <View style={styles.proCon}>
-        <ProfileImageViewer userEmail={user} />
+        <ProfileImageViewer userEmail={user} size={100} />
 
         {/* 팔로우 리스트를 컴포넌트로 따로 빼서 버튼을 누르면 호출하도록 변경 */}
         {/* 아래는 팔로우리스트 버튼 만들 예정 */}
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "white",
+    backgroundColor: "#FFFBF3",
   },
   title: {
     fontSize: 24,
