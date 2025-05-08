@@ -21,6 +21,7 @@ const Header = () => {
       if (name) setUserName(name);
     };
 
+
     fetchUserName();
   }, []);
 
