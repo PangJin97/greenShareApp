@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
   writeBtn: {
     position: "absolute",
     bottom: 30,
-    right: 20,
+    right: 12,
     backgroundColor: "#007bff",
     width: 60,
     height: 60,
