@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   item: {
     width: Dimensions.get("window").width, // ✅ 화면 가로 길이 꽉 채우기
     padding: 14,
-    marginBottom: 12,
+  
     backgroundColor: "#FFFBF3",
     borderRadius: 14,
     alignSelf: "center", // ✅ 중앙 정렬 필수!
