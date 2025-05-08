@@ -1,24 +1,32 @@
-import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View, Modal, Pressable } from "react-native";
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Modal,
+  Pressable,
+} from "react-native";
 import React, { useState } from "react";
 import { api_login } from "../../apis/memberApi";
-import { useRouter } from 'expo-router';
+import { useRouter } from "expo-router";
 import { useDispatch } from "react-redux";
-import * as SecureStore from 'expo-secure-store';
-import { loginReducer } from '../../redux/authSlice';
-import { AntDesign } from '@expo/vector-icons'; // ✅ 아이콘 사용
+import * as SecureStore from "expo-secure-store";
+import { loginReducer } from "../../redux/authSlice";
+import { AntDesign } from "@expo/vector-icons"; // ✅ 아이콘 사용
 
 const Login = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const [modalType, setModalType] = useState("success"); // "success" | "error"
 
-
   const [loginData, setLoginData] = useState({
     userEmail: "",
     userPassword: "",
   });
 
-  const [modalVisible, setModalVisible] = useState(false); 
+  const [modalVisible, setModalVisible] = useState(false);
   const [modalText, setModalText] = useState("");
 
   const loginData1 = (text, name) => {
@@ -32,14 +40,14 @@ const Login = () => {
     api_login(loginData)
       .then((res) => {
         const token = res.headers.authorization;
-  
+
         if (!token) {
           setModalType("error");
           setModalText("이메일 또는 비밀번호를 확인해주세요.");
           setModalVisible(true);
           return;
         }
-  
+
         // ✅ JWT 디코딩해서 user 정보 추출
         const payload = token.split(".")[1];
         const decodedPayload = JSON.parse(atob(payload)); // RN에서는 base-64 라이브러리 사용할 수도 있음
@@ -48,15 +56,17 @@ const Login = () => {
           userName: decodedPayload.userName,
           userRole: decodedPayload.role,
         };
-  
+
         // ✅ 토큰 저장
-        SecureStore.setItemAsync('accessToken', token)
+        SecureStore.setItemAsync("accessToken", token)
           .then(() => {
-            dispatch(loginReducer({
-              token: token,
-              user: user,
-            }));
-  
+            dispatch(
+              loginReducer({
+                token: token,
+                user: user,
+              })
+            );
+
             setModalType("success");
             setModalText(`환영합니다`);
             setModalVisible(true); // 성공 모달
@@ -75,11 +85,6 @@ const Login = () => {
         setModalVisible(true); // 실패 모달
       });
   };
-  
-  
-  
-
-  
 
   return (
     <SafeAreaView style={styles.safearea}>
@@ -112,10 +117,15 @@ const Login = () => {
       <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.modalBackdrop}>
           <View style={styles.modalContent}>
-            <View style={[
-              styles.modalIconWrapper,
-              { backgroundColor: modalType === "success" ? "#DBEAFE" : "#FECACA" }
-            ]}>
+            <View
+              style={[
+                styles.modalIconWrapper,
+                {
+                  backgroundColor:
+                    modalType === "success" ? "#DBEAFE" : "#FECACA",
+                },
+              ]}
+            >
               <AntDesign
                 name={modalType === "success" ? "checkcircleo" : "closecircleo"}
                 size={40}
@@ -129,7 +139,10 @@ const Login = () => {
             <Pressable
               style={[
                 styles.modalButton,
-                { backgroundColor: modalType === "success" ? "#3B82F6" : "#EF4444" }
+                {
+                  backgroundColor:
+                    modalType === "success" ? "#3B82F6" : "#EF4444",
+                },
               ]}
               onPress={() => {
                 setModalVisible(false);
@@ -141,8 +154,6 @@ const Login = () => {
           </View>
         </View>
       </Modal>
-
-
     </SafeAreaView>
   );
 };

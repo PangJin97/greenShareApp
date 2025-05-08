@@ -32,15 +32,16 @@ const FollowList = ({ userEmail }) => {
     }, [userEmail])
   );
 
-  const unfollow = async (toUserEmail) => {
-    try {
-      await unfollowApi(toUserEmail, userEmail);
-      setFollowList((prevList) =>
-        prevList.filter((user) => user.toUserEmail !== toUserEmail)
-      );
-    } catch (err) {
-      console.log("언팔로우 오류:", err);
-    }
+  const unfollow = (toUserEmail) => {
+    unfollowApi(toUserEmail, userEmail)
+      .then(() => {
+        setFollowList((prevList) =>
+          prevList.filter((user) => user.toUserEmail !== toUserEmail)
+        );
+      })
+      .catch((err) => {
+        console.log("언팔로우 오류:", err);
+      });
   };
 
   return (
