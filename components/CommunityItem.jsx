@@ -198,37 +198,32 @@ const handleLikeToggle = async (boardNum) => {
         </Text>
 
         <View style={styles.iconContainer}>
+          {/* 좋아요 */}
           <Pressable onPress={() => handleLikeToggle(item.boardNum)}>
             <View style={styles.likeButton}>
-              <Animatable.View
-                animation={heartAnimation ? "zoomIn" : null}
-              >
-                <Octicons
-                  name={isLiked ? "heart-fill" : "heart"}
-                  size={24}
-                  color="red"
-                />
+              <Text>좋아요</Text>
+              <Animatable.View animation={heartAnimation ? "zoomIn" : null}>
+                <Octicons name={isLiked ? "heart-fill" : "heart"} size={20} color="red" />
               </Animatable.View>
-              <CustomText weight="Light" style={isLiked && { color: "red" }} />
-              <Text style={styles.likeCount}>{selectedItem.likeCnt}</Text>
+              <Text style={{ color: isLiked ? "red" : "#333" }}>{selectedItem.likeCnt}</Text>
             </View>
           </Pressable>
 
+          {/* 댓글 */}
           <View style={styles.message}>
-            <Feather
-              name="message-circle"
-              size={24}
-              color="black"
-              style={{ transform: [{ scaleX: -1 }] }}
-            />
-            <Text style={{ marginLeft: 4 }}>{item.replyCnt}</Text>
+            <Text>댓글</Text>
+            <Feather name="message-circle" size={20} color="black" style={{ transform: [{ scaleX: -1 }] }} />
+            <Text>{item.replyCnt}</Text>
           </View>
 
+          {/* 조회수 */}
           <View style={styles.viewCountContainer}>
-            <MaterialCommunityIcons name="eye-outline" size={24} color="black" />
-            <CustomText style={styles.eyeText}>{item.readCnt}</CustomText>
+            <Text>조회수</Text>
+            <MaterialCommunityIcons name="eye-outline" size={20} color="black" />
+            <Text>{item.readCnt}</Text>
           </View>
         </View>
+
       </View>
     );
   };
@@ -238,14 +233,26 @@ const handleLikeToggle = async (boardNum) => {
 
   const styles = StyleSheet.create({
     item: {
+      width: screenWidth,           // ✅ 화면 너비만큼 꽉 채우기
+      alignSelf: "center",          // ✅ 정렬 안전하게 중앙으로
+      padding: 16,
       marginBottom: 16,
-      padding: 10,
+      borderRadius: 14,
+      backgroundColor: "#ffffff",
+    
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 4,
+      elevation: 2,
     },
+    
     header: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
       marginBottom: 8,
+      
     },
     email: {
       fontSize: 17,
@@ -262,18 +269,25 @@ const handleLikeToggle = async (boardNum) => {
       fontSize: 14,
     },
     imageContainer: {
-      width: screenWidth,
+      width: screenWidth - 32,  // 카드 padding 감안
+      alignSelf: "center",
       marginBottom: 12,
+      
     },
+    
+    
     image: {
       width: "100%",
-      height: 250,
-      borderRadius: 8,
+      height: 220,             // 너무 크면 비율 깨짐
+      borderRadius: 10,
+      resizeMode: "cover",     // 이미지 비율 유지하며 채우기
     },
+    
     title: {
       fontSize: 18,
       fontWeight: "bold",
       marginBottom: 8,
+      
     },
     preview: {
       fontSize: 14,
@@ -284,33 +298,44 @@ const handleLikeToggle = async (boardNum) => {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
+      paddingHorizontal: 8,
+      
     },
+    
     likeButton: {
+      flex: 1,
       flexDirection: "row",
       alignItems: "center",
-      marginRight: 15,
+      justifyContent: "flex-start",
+      gap: 6,
     },
+    
     likeCount: {
       marginLeft: 5,
     },
     viewCountContainer: {
-      justifyContent: "flex-end",
-      flexDirection: "row",
       flex: 1,
+      flexDirection: "row",
       alignItems: "center",
-      gap: 4,
-      marginLeft: 10,
+      justifyContent: "flex-end",
+      gap: 6,
+      
     },
+    
     eyeText: {
       marginRight: 3,
       marginLeft: 8,
+      
     },
     message: {
       flex: 1,
       flexDirection: "row",
       alignItems: "center",
-      justifyContent: "flex-end", 
+      justifyContent: "center",
+      gap: 6,
+      
     },
+    
     // 팔로우 상태일 때 버튼 스타일
     followingButton: {
       backgroundColor: "#2ab170", 

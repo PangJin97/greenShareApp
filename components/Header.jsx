@@ -108,7 +108,7 @@ export default Header;
 const styles = StyleSheet.create({
   headerContainer: {
     height: 40,
-    backgroundColor: "white",
+    backgroundColor: "#FFFBF3",
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: 10,
