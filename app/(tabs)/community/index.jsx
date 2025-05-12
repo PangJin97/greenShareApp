@@ -125,7 +125,6 @@ const ProfileHomeScreen = () => {
             paddingVertical: 16,
           }}
         />
-
       )}
 
       <Pressable
@@ -142,8 +141,7 @@ const ProfileHomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFBF3",  
-    
+    backgroundColor: "#FFFFFF",
   },
   header: {
     fontSize: 24,
@@ -152,13 +150,12 @@ const styles = StyleSheet.create({
   },
   loader: {
     marginTop: 20,
-    
   },
   item: {
     width: Dimensions.get("window").width, // ✅ 화면 가로 길이 꽉 채우기
     padding: 14,
-  
-    backgroundColor: "#FFFBF3",
+
+    backgroundColor: "#FFFFFF",
     borderRadius: 14,
     alignSelf: "center", // ✅ 중앙 정렬 필수!
   },
@@ -182,15 +179,14 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginBottom: 10,
   },
-  
+
   image: {
     width: "100%",
     height: 160,
     borderRadius: 10,
     resizeMode: "cover",
   },
-  
-  
+
   likeContainer: {
     flexDirection: "row",
     alignItems: "center",
