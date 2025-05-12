@@ -144,7 +144,15 @@ const SerchHomeScreen = () => {
               {followList.length}
             </CustomText>
           </View>
-          <Pressable style={styles.button}>
+          <Pressable
+            style={styles.button}
+            onPress={() =>
+              router.push({
+                pathname: "/follow/followList",
+                params: { userEmail: user },
+              })
+            }
+          >
             <CustomText weight="Bold" col="white">
               팔로잉 보기
             </CustomText>

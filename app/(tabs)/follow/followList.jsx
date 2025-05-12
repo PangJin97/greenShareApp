@@ -10,11 +10,11 @@ import React, { useCallback, useEffect, useState } from "react";
 import { follow, unfollowApi } from "../../../apis/memberApi";
 import MessageButton from "../../../components/MessageButton";
 import CustomText from "../../../components/common/CustomText";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useLocalSearchParams } from "expo-router";
 
-const FollowList = ({ userEmail }) => {
+const FollowList = () => {
   const [followList, setFollowList] = useState([]);
-
+  const { userEmail } = useLocalSearchParams();
   const fetchFollowList = () => {
     follow(userEmail)
       .then((res) => {
