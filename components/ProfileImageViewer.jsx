@@ -3,7 +3,7 @@ import { Image, ActivityIndicator } from "react-native";
 import { axiosInstance } from "../apis/axiosInstance";
 import { useFocusEffect } from "@react-navigation/native";
 
-const ProfileImageViewer = ({ userEmail, size = 60 }) => {
+const ProfileImageViewer = ({ userEmail, size = 60, style }) => {
   const [imageData, setImageData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -44,6 +44,7 @@ const ProfileImageViewer = ({ userEmail, size = 60 }) => {
         height: size,
         borderRadius: size / 2,
         backgroundColor: "#E3F3E8", // 자연스러운 연한 초록 계열 (로딩 전 기본 색)
+        ...style
       }}
     />
   );
